@@ -1,6 +1,6 @@
 [package]
 name = "day-skies"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2024"
 license = "Apache-2.0"
 # Generate typed resource + localization constants (`res::str::…`) from `resource/` on every build.
