@@ -8,6 +8,7 @@ fn main() {
             size: day::prelude::Size::new(960.0, 640.0),
             min_size: Some(day::prelude::Size::new(620.0, 480.0)),
             app_name: Some("Day Skies".into()),
+            ..Default::default()
         },
         day_skies::root,
     );

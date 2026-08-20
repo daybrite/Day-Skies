@@ -93,6 +93,7 @@ fn city_page(city: City) -> AnyPiece {
                     size: Size::new(700.0, 800.0),
                     min_size: None,
                     app_name: None,
+                    ..Default::default()
                 },
                 day::WindowKind::Normal,
                 move || city_page_for(&id),
@@ -129,6 +130,7 @@ pub fn root() -> AnyPiece {
             size: Size::new(560.0, 720.0),
             min_size: None,
             app_name: None,
+            ..Default::default()
         },
         settings::settings_page,
     );
@@ -179,9 +181,7 @@ fn sidebar_header() -> AnyPiece {
     .any()
 }
 
-// Mobile / embedded entry points — each macro expands to nothing off its own platform.
-day::ios_main!("Day Skies", root);
-day::macos_main!("Day Skies", root);
-day::android_main!(root);
-day::arkui_main!(root);
-day::web_main!("Day Skies", root);
+// The mobile / embedded entry point. Expands to the export each platform's shell binds
+// against — and to nothing at all on a plain cargo desktop build, where src/main.rs is the
+// entry instead.
+day::day_main!("Day Skies", root);
