@@ -301,8 +301,7 @@ pub fn sections() -> CitySections {
     // Your cities: one recycling-list row per city (drag to reorder — the order IS the sidebar
     // order, persisted with the list), edit loads it into the form, remove deletes it.
     let rows = list(
-        move || list_sig.get(),
-        |c: &City| c.id.clone(),
+        items(move || list_sig.get(), |c: &City| c.id.clone()),
         move |slot| {
             // Recycling rows (docs/list.md): a physical cell REBINDS to different cities as the
             // list changes or reorders, so actions read the slot's CURRENT key at click time and

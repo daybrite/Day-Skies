@@ -72,18 +72,18 @@ pub(crate) fn drop_state(id: &str) {
     STATES.with(|cell| cell.borrow_mut().retain(|(k, _)| k != id));
 }
 
-fn city_page(city: City) -> AnyPiece {
+fn city_page(city: City) -> impl Piece {
     let state = resource_for(&city).signal();
     let page = ui::weather_page(city.clone(), state);
     // Desktop (docs/windows.md): right-click ▸ Open in New Window — a per-city Normal
     // window (same-kind windows group as native macOS tabs). `city_page_for` re-resolves
     // by id, so the window follows the live list.
     if capability(Cap::MultiWindow) == Support::Unsupported {
-        return page;
+        return Either::Left(page);
     }
     let id = city.id.clone();
     let title = city.name.clone();
-    page.context_menu(vec![
+    Either::Right(page.context_menu(vec![
         menu_item(res::str::open_in_new_window().format()).action(move || {
             let id = id.clone();
             day::open_window(
@@ -99,23 +99,23 @@ fn city_page(city: City) -> AnyPiece {
                 move || city_page_for(&id),
             );
         }),
-    ])
+    ]))
 }
 
 /// The `.destination` for a data-driven city key: look the city up in the live list. A key that
 /// just vanished (removed mid-navigation) gets an empty pane — the selection resets right after.
-fn city_page_for(id: &str) -> AnyPiece {
+fn city_page_for(id: &str) -> impl Piece + use<> {
     match cities::cities()
         .get_untracked()
         .into_iter()
         .find(|c| c.id == id)
     {
-        Some(city) => city_page(city),
-        None => spacer().any(),
+        Some(city) => Either::Left(city_page(city)),
+        None => Either::Right(spacer()),
     }
 }
 
-pub fn root() -> AnyPiece {
+pub fn root() -> impl Piece {
     // Every locale under `resource/locales/` (en, fr, ar, zh-CN), embedded and registered by the
     // generated catalog — adding a language is a new directory, nothing to edit here.
     res::locales::install();
@@ -156,8 +156,8 @@ pub fn root() -> AnyPiece {
             |c: &City| item(c.id.clone(), cities::title(c)).immersive(),
         )
         .destination(|id: &Option<String>| match id {
-            Some(id) => city_page_for(id),
-            None => spacer().any(),
+            Some(id) => Either::Left(city_page_for(id)),
+            None => Either::Right(spacer()),
         })
         .item(
             "settings".to_string(),
@@ -165,10 +165,9 @@ pub fn root() -> AnyPiece {
             settings::settings_page,
         )
         .id("nav")
-        .any()
 }
 
-fn sidebar_header() -> AnyPiece {
+fn sidebar_header() -> impl Piece {
     column((
         label(res::str::app_title())
             .font(Font::Headline)
@@ -178,7 +177,6 @@ fn sidebar_header() -> AnyPiece {
     .spacing(2.0)
     .align(HAlign::Leading)
     .padding(12.0)
-    .any()
 }
 
 // The mobile / embedded entry point. Expands to the export each platform's shell binds

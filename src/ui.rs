@@ -67,7 +67,7 @@ pub fn sky(family: crate::weather::Family, is_day: bool) -> LinearGradient {
 }
 
 /// The whole page for one place, driven by its reactive `Load<Weather>` signal (docs/async.md).
-pub fn weather_page(place: City, state: Signal<Load<Weather>>) -> AnyPiece {
+pub fn weather_page(place: City, state: Signal<Load<Weather>>) -> impl Piece {
     let content = column((
         when(move || state.with(|s| s.is_loading()), loading_view),
         when(
@@ -83,9 +83,11 @@ pub fn weather_page(place: City, state: Signal<Load<Weather>>) -> AnyPiece {
         ),
         when(
             move || state.with(|s| s.is_ready()),
+            // `Either` rather than erasing both arms: the ready view is the real content and
+            // the fallback is a spacer the `when` above never actually shows.
             move || match state.get_untracked() {
-                Load::Ready(w) => loaded_view(&place, &w),
-                _ => spacer().any(),
+                Load::Ready(w) => Either::Left(loaded_view(&place, &w)),
+                _ => Either::Right(spacer()),
             },
         ),
     ))
@@ -114,10 +116,9 @@ pub fn weather_page(place: City, state: Signal<Load<Weather>>) -> AnyPiece {
         .grow(),
     ))
     .grow()
-    .any()
 }
 
-fn loaded_view(place: &City, w: &Weather) -> AnyPiece {
+fn loaded_view(place: &City, w: &Weather) -> impl Piece + use<> {
     column((
         hero(place, w),
         hourly_strip(w),
@@ -128,10 +129,9 @@ fn loaded_view(place: &City, w: &Weather) -> AnyPiece {
     .spacing(18.0)
     .align(HAlign::Center)
     .grow_w()
-    .any()
 }
 
-fn hero(place: &City, w: &Weather) -> AnyPiece {
+fn hero(place: &City, w: &Weather) -> impl Piece + use<> {
     let glyph = Glyph::of(w.family, w.is_day);
     column((
         label(crate::cities::title(place))
@@ -163,14 +163,13 @@ fn hero(place: &City, w: &Weather) -> AnyPiece {
     .spacing(6.0)
     .align(HAlign::Center)
     .padding(8.0)
-    .any()
 }
 
-fn section_header(text: LocalizedText) -> AnyPiece {
-    label(text).font(Font::Caption).color(TEXT2).any()
+fn section_header(text: LocalizedText) -> impl Piece {
+    label(text).font(Font::Caption).color(TEXT2)
 }
 
-fn hourly_strip(w: &Weather) -> AnyPiece {
+fn hourly_strip(w: &Weather) -> impl Piece + use<> {
     let cells: Vec<AnyPiece> = w
         .hourly
         .iter()
@@ -194,6 +193,7 @@ fn hourly_strip(w: &Weather) -> AnyPiece {
             .spacing(6.0)
             .align(HAlign::Center)
             .grow_w()
+            .any()
         })
         .collect();
 
@@ -208,7 +208,7 @@ fn hourly_strip(w: &Weather) -> AnyPiece {
     .id("hourly")
 }
 
-fn ten_day(w: &Weather) -> AnyPiece {
+fn ten_day(w: &Weather) -> impl Piece + use<> {
     let wmin = w.daily.iter().map(|d| d.low).fold(f64::MAX, f64::min);
     let wmax = w.daily.iter().map(|d| d.high).fold(f64::MIN, f64::max);
 
@@ -270,7 +270,7 @@ fn ten_day(w: &Weather) -> AnyPiece {
 /// A temperature range bar: a faint full-width track with a warm-to-cool segment for this day's
 /// low→high mapped into the whole week's range (like Apple's forecast bars). A size-aware shape
 /// group: the segment positions derive from the laid-out width, in one canvas leaf.
-fn range_bar(low: f64, high: f64, wmin: f64, wmax: f64) -> AnyPiece {
+fn range_bar(low: f64, high: f64, wmin: f64, wmax: f64) -> impl Piece {
     shape_group_fn(move |size| {
         if size.width <= 0.0 || size.height <= 0.0 {
             return Vec::new();
@@ -299,7 +299,7 @@ fn range_bar(low: f64, high: f64, wmin: f64, wmax: f64) -> AnyPiece {
     .grow_w()
 }
 
-fn detail_grid(w: &Weather) -> AnyPiece {
+fn detail_grid(w: &Weather) -> impl Piece + use<> {
     let feels_c = w.feels_like;
     let humidity = format!("{}%", w.humidity);
     let wind = format!("{} km/h", w.wind_kmh.round() as i64);
@@ -325,10 +325,9 @@ fn detail_grid(w: &Weather) -> AnyPiece {
     .spacing(12.0)
     .align(Alignment::TopLeading)
     .grow_w()
-    .any()
 }
 
-fn detail_card<M>(title: LocalizedText, value: impl IntoText<M>) -> AnyPiece {
+fn detail_card<M>(title: LocalizedText, value: impl IntoText<M>) -> impl Piece {
     card(
         column((
             label(title).font(Font::Caption).color(TEXT2),
@@ -339,7 +338,7 @@ fn detail_card<M>(title: LocalizedText, value: impl IntoText<M>) -> AnyPiece {
     )
 }
 
-fn footer(w: &Weather) -> AnyPiece {
+fn footer(w: &Weather) -> impl Piece + use<> {
     let mut items: Vec<AnyPiece> = Vec::new();
     if w.source == DataSource::Mock {
         items.push(
@@ -360,11 +359,10 @@ fn footer(w: &Weather) -> AnyPiece {
         .spacing(2.0)
         .align(HAlign::Center)
         .padding(6.0)
-        .any()
 }
 
 /// Wrap content in a translucent rounded card.
-fn card(inner: impl Piece) -> AnyPiece {
+fn card(inner: impl Piece) -> impl Piece {
     inner
         .padding(16.0)
         .background(CARD)
@@ -372,17 +370,16 @@ fn card(inner: impl Piece) -> AnyPiece {
         .grow_w()
 }
 
-fn loading_view() -> AnyPiece {
+fn loading_view() -> impl Piece {
     column((label(res::str::weather_loading())
         .font(Font::Headline)
         .color(TEXT)
         .id("loading"),))
     .align(HAlign::Center)
     .padding(40.0)
-    .any()
 }
 
-fn failed_view(msg: String) -> AnyPiece {
+fn failed_view(msg: String) -> impl Piece {
     column((
         label(res::str::weather_error())
             .font(Font::Headline)
@@ -393,5 +390,4 @@ fn failed_view(msg: String) -> AnyPiece {
     .spacing(8.0)
     .align(HAlign::Center)
     .padding(40.0)
-    .any()
 }

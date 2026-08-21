@@ -60,7 +60,7 @@ const BOLT: Color = Color::hex(0xFFD24A);
 const FOGLINE: Color = Color::hex(0xE3E9F0);
 
 /// A weather glyph as a square shape group — one canvas leaf sized to `size`.
-pub fn weather_icon(glyph: Glyph, size: f64) -> AnyPiece {
+pub fn weather_icon(glyph: Glyph, size: f64) -> impl Piece {
     shape_group(glyph_shapes(glyph, size)).frame(size, size)
 }
 

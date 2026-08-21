@@ -118,7 +118,7 @@ pub fn host() -> String {
 /// The Settings page: About, language, appearance (where the backend supports a runtime
 /// override — `Cap::Appearance`), units, the city-management sections, and the weather
 /// server, as one Form.
-pub fn settings_page() -> AnyPiece {
+pub fn settings_page() -> impl Piece {
     let (unit_sig, host_sig) = with_store(|s| (s.unit, s.host));
 
     // Language + appearance: the shared settings rows (docs/windows.md — day-piece-settings).
@@ -240,5 +240,4 @@ pub fn settings_page() -> AnyPiece {
             }),
     )
     .grow()
-    .any()
 }
