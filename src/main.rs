@@ -10,6 +10,6 @@ fn main() {
             app_name: Some("Day Skies".into()),
             ..Default::default()
         },
-        day_skies::root,
+        dayapp::root,
     );
 }
