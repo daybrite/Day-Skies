@@ -39,7 +39,7 @@ fn day_label(name: DayName) -> LocalizedText {
     }
 }
 
-// Content sits on a coloured sky, so text is light and cards are translucent "frosted" panels.
+// Content sits on a colored sky, so text is light and cards are translucent "frosted" panels.
 const TEXT: Color = Color::WHITE;
 const TEXT2: Color = Color::rgba(1.0, 1.0, 1.0, 0.72);
 const CARD: Color = Color::rgba(1.0, 1.0, 1.0, 0.14);

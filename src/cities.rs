@@ -10,7 +10,6 @@ use crate::res;
 use day::LocalizedText;
 use day::prelude::*;
 use serde::{Deserialize, Serialize};
-use std::cell::OnceCell;
 
 /// The prefs key holding the whole list as a JSON array.
 const PREF_CITIES: &str = "dayskies.cities";
@@ -120,24 +119,28 @@ fn defaults() -> Vec<City> {
         .collect()
 }
 
-thread_local! {
-    static STORE: OnceCell<Signal<Vec<City>>> = const { OnceCell::new() };
+/// The user's city list — one for the whole APP (docs/state.md). It is the app's document, and
+/// every window edits the same one: adding a city in one window adds it everywhere, the way a
+/// second Finder window shows the same folders.
+#[derive(Clone, Copy)]
+pub struct Cities(Signal<Vec<City>>);
+
+impl Ambient for Cities {
+    fn create() -> Self {
+        let seed = match day_part_prefs::get(PREF_CITIES) {
+            // A saved list wins, even an empty one (the user removed every city);
+            // unparseable JSON falls back to the defaults rather than a dead app.
+            Some(json) => serde_json::from_str(&json).unwrap_or_else(|_| defaults()),
+            None => defaults(),
+        };
+        Cities(Signal::new(seed))
+    }
 }
 
-/// The city list signal — created once in a detached scope (the settings-Store pattern: it must
-/// outlive any page that touches it first) and seeded from the persistent store.
+/// The city list signal. Owned by the reactive ROOT scope through `Ambient::app`, so it outlives
+/// any page that touches it first.
 pub fn cities() -> Signal<Vec<City>> {
-    STORE.with(|cell| {
-        *cell.get_or_init(|| {
-            let seed = match day_part_prefs::get(PREF_CITIES) {
-                // A saved list wins, even an empty one (the user removed every city);
-                // unparseable JSON falls back to the defaults rather than a dead app.
-                Some(json) => serde_json::from_str(&json).unwrap_or_else(|_| defaults()),
-                None => defaults(),
-            };
-            Scope::detached().enter(|| Signal::new(seed))
-        })
-    })
+    Cities::app().0
 }
 
 /// A city's display name: user text when renamed, else the localized catalog name by id.

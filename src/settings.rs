@@ -5,7 +5,6 @@
 
 use crate::res;
 use day::prelude::*;
-use std::cell::OnceCell;
 
 /// The default forecast host; the settings page lets users point at an Open-Meteo-compatible
 /// proxy instead.
@@ -30,8 +29,10 @@ pub enum Unit {
     Fahrenheit,
 }
 
-/// The settings signals, created once in the root scope (first access must happen during the
-/// root build) and seeded from the persistent store.
+/// The settings signals — one set for the whole APP (docs/state.md). Preferences are app-wide
+/// by nature: a unit or a host chosen in one window is the same choice in every other, so this
+/// is `Ambient::app()` rather than per-window `Scene` state.
+#[derive(Clone, Copy)]
 struct Store {
     /// Picker index: 0 = Celsius, 1 = Fahrenheit.
     unit: Signal<usize>,
@@ -42,42 +43,36 @@ struct Store {
     applied_host: Signal<String>,
 }
 
-thread_local! {
-    static STORE: OnceCell<Store> = const { OnceCell::new() };
+impl Ambient for Store {
+    /// Created on the reactive ROOT scope by `Ambient::app`, which is what the detached scope
+    /// here used to emulate — these signals must outlive the build scope of whichever page
+    /// happens to touch settings first, or a page rebuild would dispose them under it.
+    fn create() -> Self {
+        let unit = Signal::new(match day_part_prefs::get(PREF_UNIT).as_deref() {
+            Some("f") => 1,
+            _ => 0,
+        });
+        let host =
+            Signal::new(day_part_prefs::get(PREF_HOST).unwrap_or_else(|| DEFAULT_HOST.to_string()));
+        let applied_host = Signal::new(host.get_untracked());
+        // The unit applies (and persists) immediately on selection; the reactive temperature
+        // labels re-render from the signal, no refetch needed (the model stays °C).
+        watch(
+            move || unit.get(),
+            |new, _| {
+                day_part_prefs::set(PREF_UNIT, if *new == 1 { "f" } else { "c" });
+            },
+        );
+        Store {
+            unit,
+            host,
+            applied_host,
+        }
+    }
 }
 
 fn with_store<R>(f: impl FnOnce(&Store) -> R) -> R {
-    STORE.with(|cell| {
-        f(cell.get_or_init(|| {
-            // App-lifetime signals: a detached scope (the matrix-core pattern), NOT the build
-            // scope of whichever page happens to touch settings first — that scope is disposed
-            // when the page rebuilds, and a disposed signal panics on read.
-            Scope::detached().enter(|| {
-                let unit = Signal::new(match day_part_prefs::get(PREF_UNIT).as_deref() {
-                    Some("f") => 1,
-                    _ => 0,
-                });
-                let host = Signal::new(
-                    day_part_prefs::get(PREF_HOST).unwrap_or_else(|| DEFAULT_HOST.to_string()),
-                );
-                let applied_host = Signal::new(host.get_untracked());
-                // The unit applies (and persists) immediately on selection; the reactive
-                // temperature labels re-render from the signal, no refetch needed (the model
-                // stays °C).
-                watch(
-                    move || unit.get(),
-                    |new, _| {
-                        day_part_prefs::set(PREF_UNIT, if *new == 1 { "f" } else { "c" });
-                    },
-                );
-                Store {
-                    unit,
-                    host,
-                    applied_host,
-                }
-            })
-        }))
-    })
+    f(&Store::app())
 }
 
 /// The selected unit (tracked read — reactive closures re-run when it changes).

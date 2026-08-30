@@ -6,6 +6,7 @@
 
 use day::prelude::*;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 mod cities;
 mod icons;
@@ -29,11 +30,18 @@ pub mod res {
     include!(concat!(env!("OUT_DIR"), "/day_resources.rs"));
 }
 
-thread_local! {
-    /// Per-city weather resources (docs/async.md), memoized by place id so navigating between
-    /// cities (which rebuilds the detail pane) reuses the same loaded data.
-    static STATES: RefCell<Vec<(String, day::reactive::Resource<Weather>)>> =
-        const { RefCell::new(Vec::new()) };
+/// Per-city weather resources (docs/async.md), memoized by place id so navigating between
+/// cities (which rebuilds the detail pane) reuses the same loaded data.
+///
+/// APP-wide (docs/state.md), not per-window: it is a fetch CACHE over shared data, and two
+/// windows showing the same city should read one load rather than each starting its own.
+#[derive(Clone)]
+struct Forecasts(Rc<RefCell<Vec<(String, day::reactive::Resource<Weather>)>>>);
+
+impl Ambient for Forecasts {
+    fn create() -> Self {
+        Forecasts(Rc::new(RefCell::new(Vec::new())))
+    }
 }
 
 /// Get (creating on first call) the weather resource for a city. The resource TRACKS the
@@ -41,40 +49,60 @@ thread_local! {
 /// resolves synchronously inside the fetcher; the live path awaits the platform fetch through
 /// `fetch_future` (docs/http.md) — cancellation and latest-wins ride the Resource.
 fn resource_for(city: &City) -> day::reactive::Resource<Weather> {
-    STATES.with(|cell| {
-        if let Some((_, r)) = cell.borrow().iter().find(|(id, _)| *id == city.id) {
-            return *r;
-        }
-        // Root scope, NOT the calling page's build scope: the resource must outlive the detail
-        // pane that first touched it (a page-scoped resource would be disposed on navigation and
-        // the memoized handle would go dead — the settings Store's detached-scope rationale).
-        let fetch_city = city.clone();
-        let r = day::reactive::Scope::root().enter(|| {
-            day::reactive::Resource::new(settings::host, move |host| {
-                weather::load(fetch_city.clone(), host)
-            })
-        });
-        cell.borrow_mut().push((city.id.clone(), r));
-        r
-    })
+    let cache = Forecasts::app().0;
+    if let Some((_, r)) = cache.borrow().iter().find(|(id, _)| *id == city.id) {
+        return *r;
+    }
+    // Root scope, NOT the calling page's build scope: the resource must outlive the detail
+    // pane that first touched it (a page-scoped resource would be disposed on navigation and
+    // the memoized handle would go dead — the settings Store's app-scope rationale).
+    let fetch_city = city.clone();
+    let r = day::reactive::Scope::root().enter(|| {
+        day::reactive::Resource::new(settings::host, move |host| {
+            weather::load(fetch_city.clone(), host)
+        })
+    });
+    cache.borrow_mut().push((city.id.clone(), r));
+    r
 }
 
 /// Refetch every city (the settings Save action). Save also writes the applied-host signal the
 /// resources track, so a CHANGED host refetches twice-deduped into one run (both dependencies
 /// dirty in the same drain); an unchanged host still refetches — Save always re-checks.
 pub(crate) fn reload_all() {
-    STATES.with(|cell| {
-        for (_, r) in cell.borrow().iter() {
-            r.refetch();
-        }
-    });
+    for (_, r) in Forecasts::app().0.borrow().iter() {
+        r.refetch();
+    }
 }
 
 /// Forget a city's memoized resource — removal, or an edit that may have moved its coordinates
 /// (the next view rebuilds it fresh). The dropped resource's nodes stay in the root scope until
 /// exit; that leak is bounded by the user's edit count.
 pub(crate) fn drop_state(id: &str) {
-    STATES.with(|cell| cell.borrow_mut().retain(|(k, _)| k != id));
+    Forecasts::app().0.borrow_mut().retain(|(k, _)| k != id);
+}
+
+/// Everything ONE WINDOW owns (docs/state.md): which city it is showing. `Copy`, because a
+/// `Signal` is a handle — so it rides into the nav's closures without ceremony.
+///
+/// File ▸ New Window builds `window_shell` again, and `Ambient::scoped` gives that build its own
+/// `Scene`: the two windows browse the same city list independently.
+#[derive(Clone, Copy)]
+pub(crate) struct Scene {
+    section: Signal<Option<String>>,
+}
+
+impl Ambient for Scene {
+    fn create() -> Self {
+        // Open on the first city so both desktop and mobile show weather immediately.
+        let first = cities::cities()
+            .get_untracked()
+            .first()
+            .map(|c| c.id.clone());
+        Scene {
+            section: Signal::new(first),
+        }
+    }
 }
 
 fn city_page(city: City) -> impl Piece {
@@ -141,35 +169,42 @@ pub fn root() -> impl Piece {
     );
 
     // Create every stored city's resource in the (permanent) root scope and start loading now.
-    let city_list = cities::cities();
-    for city in city_list.get_untracked() {
+    for city in cities::cities().get_untracked() {
         let _ = resource_for(&city);
     }
+    // File ▸ New Window (docs/windows.md): the SAME shell again, which is exactly why the
+    // selection lives on a `Scene` rather than in a global — each call gets its own.
+    day::register_new_window(window_shell);
 
-    // Open on the first city so both desktop and mobile show weather immediately.
-    let first = city_list.get_untracked().first().map(|c| c.id.clone());
-    let section: Signal<Option<String>> = Signal::new(first);
-    selector(section)
-        .style(SelectorStyle::Sidebar)
-        .title(res::str::app_title())
-        .header(sidebar_header)
-        // The city rows re-derive whenever the list changes (add/edit/remove on the
-        // Settings page). They keep the floating transparent chrome over the full-bleed sky
-        // (android edge-to-edge); Settings keeps the standard opaque bar.
-        .items(
-            move || city_list.get(),
-            |c: &City| item(c.id.clone(), cities::title(c)).immersive(),
-        )
-        .destination(|id: &Option<String>| match id {
-            Some(id) => Either::Left(city_page_for(id)),
-            None => Either::Right(spacer()),
-        })
-        .item(
-            "settings".to_string(),
-            res::str::settings_title(),
-            settings::settings_page,
-        )
-        .id("nav")
+    window_shell()
+}
+
+/// One window's UI — the first window's, and every File ▸ New Window's.
+fn window_shell() -> impl Piece {
+    let city_list = cities::cities();
+    Scene::scoped(move |scene| {
+        selector(scene.section)
+            .style(SelectorStyle::Sidebar)
+            .title(res::str::app_title())
+            .header(sidebar_header)
+            // The city rows re-derive whenever the list changes (add/edit/remove on the
+            // Settings page). They keep the floating transparent chrome over the full-bleed sky
+            // (android edge-to-edge); Settings keeps the standard opaque bar.
+            .items(
+                move || city_list.get(),
+                |c: &City| item(c.id.clone(), cities::title(c)).immersive(),
+            )
+            .destination(|id: &Option<String>| match id {
+                Some(id) => Either::Left(city_page_for(id)),
+                None => Either::Right(spacer()),
+            })
+            .item(
+                "settings".to_string(),
+                res::str::settings_title(),
+                settings::settings_page,
+            )
+            .id("nav")
+    })
 }
 
 fn sidebar_header() -> impl Piece {
