@@ -42,5 +42,16 @@
 		<key>UIApplicationSupportsMultipleScenes</key>
 		<true/>
 	</dict>
+	<key>DayWindowMinHeight</key>
+	<string>$(DAY_WINDOW_MIN_HEIGHT)</string>
+	<key>DayWindowMinWidth</key>
+	<string>$(DAY_WINDOW_MIN_WIDTH)</string>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
 </dict>
 </plist>
