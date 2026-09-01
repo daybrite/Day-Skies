@@ -31,10 +31,20 @@ day-build = { path = "/path/to/day/crates/day-build" }
 
 ## Run it
 
-Day compiles one backend per binary, so pick a target when you build or launch:
+`day launch --git` clones this repo, builds it for your desktop, and runs it — no checkout needed:
 
 ```sh
-day doctor                                   # check toolchains
+cargo install day-cli
+day doctor                                                 # what's installed, what's missing
+day launch --git https://github.com/daybrite/Day-Skies.git
+```
+
+`day doctor` prints the fix for anything it can't find. `day launch --git` prints where it put the
+checkout, so you can `cd` there and edit the code.
+
+From inside a clone, pick a target — Day compiles one backend per binary:
+
+```sh
 day launch -p macos-appkit                   # build + run (LIVE Open-Meteo data)
 day launch -p macos-appkit -p macos-gtk -p macos-qt   # all three desktop toolkits
 day launch -p ios-uikit                      # needs a booted Simulator
