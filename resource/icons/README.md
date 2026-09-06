@@ -1,38 +1,31 @@
-# Day Skies — "Sun & Cloud" icon exports
+# Day Skies — "Sun & Cloud" icon
 
 Master art: `day-icon.svg` — a warm sun peeking behind a soft cumulus cloud on a day-sky gradient.
 Sky `#2F80F0 → #8FC4FF`, sun `#FDBE4A` (amber, echoing the Day sunrise mark), cloud
-`#FFFFFF → #E4EFFB`. Full-bleed square; each platform applies its own mask/shape.
+`#FFFFFF → #E4EFFB`. Full-bleed square; each platform applies its own mask/shape. Its top-level
+`day:background` / `day:foreground*` ids drive the Android adaptive split, the iOS layered icon
+and the monochrome variant.
 
-Every raster below is generated from the master by **`day icon`** (docs/icons.md): the master's
-top-level `day:background` / `day:foreground*` ids drive the Android adaptive split, and the
-committed `platform/` copies are synced in the same run. Edit the master, re-run `day icon`;
-`day icon --check` is the CI drift gate, and `icons.lock.json` records the generator.
+Nothing derived is checked in. `day prepare` (run by every `day build`, and by the VS Code
+extension before it opens a host project) renders the master into `build/day/host/`, and the
+checked-in Xcode, Gradle and hvigor projects read from there — see `docs/icons.md` in the `day`
+repository for the layout, and `day prepare --check` for the CI drift gate. Edit the master and
+build; there is no export step to remember.
 
-## iOS (`ios/`)
-- `AppIcon-1024.png` — full-bleed square, **opaque** (no alpha, for App Store validation). The
-  Xcode AppIcon single-size slot; iOS applies its own corner mask.
-- `day-icon-ios.svg` — the master art, for re-export.
+## Hand-drawn variants
 
-## Android (`android/`)
-- `ic_launcher_foreground.svg/png` (432×432) — the sun+cloud motif inside the 66dp safe zone,
-  transparent background.
-- `ic_launcher_background.svg/png` (432×432) — the sky gradient.
-- `ic_launcher-legacy-192.png` — legacy launcher fallback (full-bleed, opaque).
-- `play-store-512.png` — Play listing icon (full-bleed, opaque).
+These are the artist's per-platform renderings of the same motif, kept for reference and
+re-export. The pipeline does not read them. An override is a master for one family, full-bleed
+square art that `day prepare` shapes the way it shapes `day-icon.svg`: copied to
+`resource/icons/<family>.svg` (`ios.svg`, `android.svg`, …), the iOS and Android variants
+below would qualify. The macOS variant already carries the rounded body and margin the
+pipeline adds itself, so it stays a reference drawing.
 
-## macOS (`macos/`)
-- `day-icon-macos.svg` + `day-icon-macos-{16,32,128,256,512,1024}.png` — the art in Apple's rounded
-  body with a transparent margin (824 pt art on a 1024 canvas). `day pack -p macos-appkit` builds
-  `AppIcon.icns` from these via `sips`/`iconutil`; the desktop dock icon is loaded from the largest.
-
-## Windows (`windows/`)
-- `day.ico` — multi-size (256/48/32/16, PNG-compressed).
-- `day-icon-256.png`.
-
-## Linux (`linux/`)
-- `day-icon-{512,256,128,48}.png` — install under `hicolor/<size>x<size>/apps/`; the root
-  `day-icon.svg` serves `hicolor/scalable/apps/`.
-
-## Web / general (`png/`)
-- `day-icon-{1024,512,256,128,64,32,16}.png` — favicons, PWA manifest, etc.
+- `ios/day-icon-ios.svg` — the motif as a full-bleed square, the shape iOS masks itself.
+- `macos/day-icon-macos.svg` — the motif in Apple's rounded body with the transparent margin
+  (824 pt art on a 1024 canvas).
+- `android/ic_launcher_foreground.svg` — the sun and cloud inside the 66 dp safe zone of the
+  108 dp adaptive canvas, transparent background.
+- `android/ic_launcher_background.svg` — the sky gradient alone.
+- `android/ic_launcher_monochrome.png` — a raster of the themed-icon silhouette; `day prepare`
+  now derives a vector monochrome from the master's foreground instead.
