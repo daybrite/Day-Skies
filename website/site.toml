@@ -1,5 +1,5 @@
 # Day Skies website (https://daybrite.github.io/Day-Skies/) — built by the shared
-# build-day-app workflow from the daybrite/daysite template. Everything content-ful
+# dayapp workflow from the daybrite/daysite template. Everything content-ful
 # (name, description, screenshots, downloads) comes from Day.toml, store/, and the
 # release pipeline; this file holds only what is genuinely site-specific.
 
