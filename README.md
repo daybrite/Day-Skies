@@ -5,10 +5,10 @@ A weather app that draws each city under a sky that matches its forecast, built 
 iPhone, Android, Mac, Windows, Linux, HarmonyOS, and the web.
 
 <p align="center">
-  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/ios-uikit/en/san-francisco.png" width="200" alt="San Francisco on iPhone"></kbd>
-  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/android-mdc/en/london.png" width="200" alt="London on Android"></kbd>
-  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/ios-uikit/en/tokyo.png" width="200" alt="Tokyo on iPhone"></kbd>
-  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/android-mdc/en/sydney.png" width="200" alt="Sydney on Android"></kbd>
+  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/ios-uikit/iphone/en/san-francisco.png" width="200" alt="San Francisco on iPhone"></kbd>
+  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/android-mdc/phone/en/london.png" width="200" alt="London on Android"></kbd>
+  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/ios-uikit/iphone/en/tokyo.png" width="200" alt="Tokyo on iPhone"></kbd>
+  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/android-mdc/phone/en/sydney.png" width="200" alt="Sydney on Android"></kbd>
 </p>
 
 ## Run it in one command
@@ -63,10 +63,10 @@ publishes the results to the [gallery](https://daybrite.dev/gallery/Day-Skies/).
 Settings is a native form on each platform, and the Arabic build mirrors the whole layout:
 
 <p align="center">
-  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/ios-uikit/en/settings.png" width="200" alt="Settings on iPhone"></kbd>
-  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/android-mdc/en/settings.png" width="200" alt="Settings on Android"></kbd>
-  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/ios-uikit/ar/san-francisco.png" width="200" alt="San Francisco in Arabic on iPhone"></kbd>
-  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/android-mdc/zh-CN/tokyo.png" width="200" alt="Tokyo in Simplified Chinese on Android"></kbd>
+  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/ios-uikit/iphone/en/settings.png" width="200" alt="Settings on iPhone"></kbd>
+  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/android-mdc/phone/en/settings.png" width="200" alt="Settings on Android"></kbd>
+  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/ios-uikit/iphone/ar/san-francisco.png" width="200" alt="San Francisco in Arabic on iPhone"></kbd>
+  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/android-mdc/phone/zh-CN/tokyo.png" width="200" alt="Tokyo in Simplified Chinese on Android"></kbd>
 </p>
 
 ## Build from a clone
