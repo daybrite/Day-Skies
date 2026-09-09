@@ -1,6 +1,6 @@
 //! The weather screen — an Apple-Weather-inspired layout: a hero with the current conditions, an
 //! hourly strip, a 10-day forecast with range bars, and a grid of detail cards. Authored once and
-//! realized natively on every backend; the `selector` in `lib.rs` makes it a sidebar+detail split
+//! realized natively on every backend; the `nav` in `lib.rs` makes it a sidebar+detail split
 //! on desktop and a push-list on mobile with no branching here.
 
 use crate::cities::City;

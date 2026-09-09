@@ -36,7 +36,7 @@ cloudy, fog, rain, snow, or thunderstorms.
 </p>
 
 On a desktop the cities sit in a sidebar next to the forecast. On a phone the same list pushes
-each city's screen. Both come from one `selector` in `src/lib.rs`, and Day picks the native
+each city's screen. Both come from one `nav` in `src/lib.rs`, and Day picks the native
 container for the window size.
 
 - Add as many cities as you like, by name, by coordinates, or from your current location.
@@ -117,7 +117,7 @@ day patch --local /path/to/day
 
 ## Inside the code
 
-- `src/lib.rs` sets up `root()` and the adaptive shell: a `selector` over cities and the
+- `src/lib.rs` sets up `root()` and the adaptive shell: a `nav` over cities and the
   per-city reactive weather store.
 - `src/weather.rs` is the data layer: the Open-Meteo fetch through `day-part-http`, WMO
   weather-code mapping, and the mock fixtures.

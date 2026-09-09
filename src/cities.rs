@@ -2,7 +2,7 @@
 //! that `settings.rs` composes into the Settings page.
 //!
 //! The list is a root-lifetime `Signal<Vec<City>>` seeded from day-part-prefs (JSON under one
-//! key) and written back on every mutation. `lib.rs` derives the selector's city items from it,
+//! key) and written back on every mutation. `lib.rs` derives the nav's city items from it,
 //! so adding or removing a city re-derives the native sidebar rows reactively
 //! (https://daybrite.dev/docs/navigation — data-driven items).
 
@@ -17,10 +17,10 @@ const PREF_CITIES: &str = "dayskies.cities";
 /// The id the "Use current location" button writes (each fix replaces the previous one).
 pub const MY_LOCATION: &str = "my-location";
 
-/// The two static selector items city ids must never shadow.
+/// The two static nav items city ids must never shadow.
 const RESERVED_IDS: [&str; 2] = ["cities", "settings"];
 
-/// One city on the list. `id` is the selector route key (stable across edits — deep links and
+/// One city on the list. `id` is the nav route key (stable across edits — deep links and
 /// DayScript address it) and the mock-weather seed. An empty `name` means "not renamed": the
 /// display name comes from the preset catalog (or the "My location" constant) by id, localized;
 /// a non-empty `name` is user text and wins.
@@ -215,7 +215,7 @@ fn slug(name: &str) -> String {
     }
 }
 
-/// The slug, made unique against the current list and the static selector keys.
+/// The slug, made unique against the current list and the static nav keys.
 fn unique_id(name: &str, existing: &[City]) -> String {
     let base = slug(name);
     let taken = |id: &str| RESERVED_IDS.contains(&id) || existing.iter().any(|c| c.id == id);

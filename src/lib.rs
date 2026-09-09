@@ -1,5 +1,5 @@
 //! Day Skies — a weather app built with [Day](https://daybrite.dev). `root()` is the whole UI,
-//! shared by every platform. A `selector` over the user's city list is the adaptive shell: a
+//! shared by every platform. A `nav` over the user's city list is the adaptive shell: a
 //! sidebar + detail split on desktop, a list that pushes the detail on mobile. The list itself
 //! is editable (`cities.rs`) and persists via day-part-prefs; each city's weather lives in its
 //! own reactive signal, fed by the data layer in `weather.rs`.
@@ -183,8 +183,8 @@ pub fn root() -> impl Piece {
 fn window_shell() -> impl Piece {
     let city_list = cities::cities();
     Scene::scoped(move |scene| {
-        selector(scene.section)
-            .style(SelectorStyle::Sidebar)
+        nav(scene.section)
+            .style(NavStyle::Sidebar)
             .title(res::str::app_title())
             .header(sidebar_header)
             // The city rows re-derive whenever the list changes (add/edit/remove on the
