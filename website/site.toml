@@ -14,3 +14,7 @@ webapp = "webapp"
 
 # Web-first: the live build is one click away, so preselect it in the platform picker.
 default-platform = "web"
+
+# The backdrop is the sky, so opening it up behind the sun is what the artwork
+# asks for.
+icon-effect = "iris"
