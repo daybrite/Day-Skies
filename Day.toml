@@ -8,7 +8,7 @@ schema = 1
 [app]
 id = "dev.daybrite.dayskies"
 title = "Day Skies"
-build = 1
+build = 2
 # The 8 shipping platform-toolkit pairs. `windows-xaml`, `linux-gtk`, and `linux-qt` build in CI
 # on their native hosts; on a macOS dev box we exercise the toolkits locally as `macos-appkit`,
 # `macos-gtk`, `macos-qt`, `ios-uikit`, `android-mdc`, `harmony-arkui`, and `web-dom` (GTK/Qt are portable, so
