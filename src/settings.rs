@@ -1,5 +1,5 @@
 //! App settings, one page: About, language, appearance, temperature unit, the user's city
-//! list (`cities.rs` builds those sections), and the Open-Meteo host — persisted via
+//! list (`cities.rs` builds those sections), and the Open-Meteo host; all persisted via
 //! day-part-prefs and exposed as signals the UI reads reactively. A native Form
 //! (docs/forms.md): grouped section cards on every platform.
 
@@ -15,7 +15,7 @@ const PREF_HOST: &str = "dayskies.host";
 const PREF_LOCALE: &str = "dayskies.locale"; // a res::locales::ALL tag; absent = system
 const PREF_THEME: &str = "dayskies.theme"; // "light" | "dark"; absent = system
 
-/// Apply the persisted language and theme overrides — called once from `root()`, right after
+/// Apply the persisted language and theme overrides; called once from `root()`, right after
 /// the locale catalog installs and before the first page builds. The shared piece owns the
 /// mechanics (docs/windows.md), including the env-wins rule: a `DAY_THEME`/`--locale` launch
 /// keeps its override no matter what an earlier run persisted.
@@ -29,7 +29,7 @@ pub enum Unit {
     Fahrenheit,
 }
 
-/// The settings signals — one set for the whole APP (docs/state.md). Preferences are app-wide
+/// The settings signals: one set for the whole app (docs/state.md). Preferences are app-wide
 /// by nature: a unit or a host chosen in one window is the same choice in every other, so this
 /// is `Ambient::app()` rather than per-window `Scene` state.
 #[derive(Clone, Copy)]
@@ -38,14 +38,14 @@ struct Store {
     unit: Signal<usize>,
     /// Host name as edited in the field (persisted + applied by the Save action).
     host: Signal<String>,
-    /// The host the fetches actually use — written ONLY by Save, so the weather `Resource`s
+    /// The host the fetches use, written only by Save, so the weather `Resource`s
     /// (which track [`host`]) refetch on Save, never per keystroke in the field.
     applied_host: Signal<String>,
 }
 
 impl Ambient for Store {
-    /// Created on the reactive ROOT scope by `Ambient::app`, which is what the detached scope
-    /// here used to emulate — these signals must outlive the build scope of whichever page
+    /// Created on the reactive root scope by `Ambient::app`, which is what the detached scope
+    /// here used to emulate: these signals must outlive the build scope of whichever page
     /// happens to touch settings first, or a page rebuild would dispose them under it.
     fn create() -> Self {
         let unit = Signal::new(match day_part_prefs::get(PREF_UNIT).as_deref() {
@@ -75,7 +75,7 @@ fn with_store<R>(f: impl FnOnce(&Store) -> R) -> R {
     f(&Store::app())
 }
 
-/// The selected unit (tracked read — reactive closures re-run when it changes).
+/// The selected unit (tracked read; reactive closures re-run when it changes).
 pub fn unit() -> Unit {
     if with_store(|s| s.unit.get()) == 1 {
         Unit::Fahrenheit
@@ -89,7 +89,7 @@ pub fn temp(celsius: f64) -> String {
     format!("{}\u{00B0}", temp_value(celsius))
 }
 
-/// A Celsius temperature rounded in the selected unit (tracked read) — for Fluent args.
+/// A Celsius temperature rounded in the selected unit (tracked read), for Fluent args.
 pub fn temp_value(celsius: f64) -> i64 {
     let v = match unit() {
         Unit::Celsius => celsius,
@@ -98,7 +98,7 @@ pub fn temp_value(celsius: f64) -> i64 {
     v.round() as i64
 }
 
-/// The currently-applied forecast host — a TRACKED read of the Save-applied signal, so a
+/// The currently-applied forecast host: a tracked read of the Save-applied signal, so a
 /// weather `Resource` using it as its source refetches when Save applies a new host.
 pub fn host() -> String {
     let h = with_store(|s| s.applied_host.get());
@@ -111,20 +111,20 @@ pub fn host() -> String {
 }
 
 /// The Settings page: About, language, appearance (where the backend supports a runtime
-/// override — `Cap::Appearance`), units, the city-management sections, and the weather
+/// override, `Cap::Appearance`), units, the city-management sections, and the weather
 /// server, as one Form.
 pub fn settings_page() -> impl Piece {
     let (unit_sig, host_sig) = with_store(|s| (s.unit, s.host));
 
-    // Language + appearance: the shared settings rows (docs/windows.md — day-piece-settings).
+    // Language + appearance: the shared settings rows (docs/windows.md, day-piece-settings).
     // Same ids (`language-picker`/`theme-picker`), same persistence keys, same live apply;
     // the appearance row is Cap::Appearance-gated inside the piece (empty when unsupported).
     let language_row = day_piece_settings::language_picker(PREF_LOCALE, res::locales::ALL);
     let theme_row = day_piece_settings::appearance_picker(PREF_THEME);
 
     // The segmented picker has no ArkUI backend yet; HarmonyOS gets a native toggle instead.
-    // One id call for both variants — the branches are cfg-disjoint, so a single
-    // call site keeps the dayscript address stable AND keeps `day lint`'s duplicate-id check
+    // One id call for both variants: the branches are cfg-disjoint, so a single
+    // call site keeps the dayscript address stable and keeps `day lint`'s duplicate-id check
     // (which reads text, not cfg) from seeing two.
     let unit_row = {
         #[cfg(not(target_env = "ohos"))]
@@ -166,7 +166,7 @@ pub fn settings_page() -> impl Piece {
 
     let city = crate::cities::sections();
 
-    // About, app-level preferences, the city list, then the server — heterogeneous and
+    // About, app-level preferences, the city list, then the server: heterogeneous and
     // partly conditional, so a PieceVec rather than a tuple.
     let mut parts: Vec<AnyPiece> = vec![
         // About: name, version, build date (stamped by build.rs), and the project page.
@@ -194,7 +194,7 @@ pub fn settings_page() -> impl Piece {
         ),
         AnyPiece::new(section((language_row,)).title(res::str::settings_language_section())),
     ];
-    // The appearance row gates itself on Cap::Appearance (empty piece when unsupported) —
+    // The appearance row gates itself on Cap::Appearance (empty piece when unsupported), but
     // an empty section card would still render, so keep the section gate too.
     if capability(Cap::Appearance) != Support::Unsupported {
         parts.push(AnyPiece::new(

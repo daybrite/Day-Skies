@@ -1,7 +1,7 @@
 //! Generate typed resource + localization constants from `resource/` (day-build): the `res` module
 //! in `src/lib.rs` surfaces `res::str::<key>()` for every Fluent message, checked at compile time.
 //! Also stamps the build date (UTC, ISO) into `DAY_SKIES_BUILD_DATE` for the settings About
-//! section — from `SOURCE_DATE_EPOCH` when a reproducible-build harness sets it, else now.
+//! section, from `SOURCE_DATE_EPOCH` when a reproducible-build harness sets it, else now.
 
 fn main() {
     day_build::generate_resources().expect("day-build: resource codegen");
@@ -20,7 +20,7 @@ fn main() {
     println!("cargo:rustc-env=DAY_SKIES_BUILD_DATE={y:04}-{m:02}-{d:02}");
 }
 
-/// Civil date from days since the Unix epoch (Howard Hinnant's `civil_from_days`) — a dozen
+/// Civil date from days since the Unix epoch (Howard Hinnant's `civil_from_days`): a dozen
 /// lines beat a chrono dependency for one date stamp.
 fn ymd_from_days(days: i64) -> (i64, u32, u32) {
     let z = days + 719_468;

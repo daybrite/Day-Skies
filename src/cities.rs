@@ -4,7 +4,7 @@
 //! The list is a root-lifetime `Signal<Vec<City>>` seeded from day-part-prefs (JSON under one
 //! key) and written back on every mutation. `lib.rs` derives the nav's city items from it,
 //! so adding or removing a city re-derives the native sidebar rows reactively
-//! (https://daybrite.dev/docs/navigation — data-driven items).
+//! (https://daybrite.dev/docs/navigation, data-driven items).
 
 use crate::res;
 use day::LocalizedText;
@@ -20,7 +20,7 @@ pub const MY_LOCATION: &str = "my-location";
 /// The two static nav items city ids must never shadow.
 const RESERVED_IDS: [&str; 2] = ["cities", "settings"];
 
-/// One city on the list. `id` is the nav route key (stable across edits — deep links and
+/// One city on the list. `id` is the nav route key (stable across edits; deep links and
 /// DayScript address it) and the mock-weather seed. An empty `name` means "not renamed": the
 /// display name comes from the preset catalog (or the "My location" constant) by id, localized;
 /// a non-empty `name` is user text and wins.
@@ -119,7 +119,7 @@ fn defaults() -> Vec<City> {
         .collect()
 }
 
-/// The user's city list — one for the whole APP (docs/state.md). It is the app's document, and
+/// The user's city list: one for the whole app (docs/state.md). It is the app's document, and
 /// every window edits the same one: adding a city in one window adds it everywhere, the way a
 /// second Finder window shows the same folders.
 #[derive(Clone, Copy)]
@@ -137,7 +137,7 @@ impl Ambient for Cities {
     }
 }
 
-/// The city list signal. Owned by the reactive ROOT scope through `Ambient::app`, so it outlives
+/// The city list signal. Owned by the reactive root scope through `Ambient::app`, so it outlives
 /// any page that touches it first.
 pub fn cities() -> Signal<Vec<City>> {
     Cities::app().0
@@ -158,7 +158,7 @@ pub fn title(city: &City) -> LocalizedText {
     }
 }
 
-/// Apply one mutation, persist, and publish — every list change funnels through here.
+/// Apply one mutation, persist, and publish; every list change funnels through here.
 fn update(f: impl FnOnce(&mut Vec<City>)) {
     let sig = cities();
     let mut v = sig.get_untracked();
@@ -170,7 +170,7 @@ fn update(f: impl FnOnce(&mut Vec<City>)) {
 }
 
 /// Drag-to-reorder (docs/list.md): the row at `from` now sits at `to`. The JSON array already
-/// encodes order, so the same persist path covers it — the sidebar follows the same Vec.
+/// encodes order, so the same persist path covers it; the sidebar follows the same Vec.
 pub fn move_city(from: usize, to: usize) {
     update(|v| {
         if from < v.len() && to < v.len() {
@@ -301,14 +301,14 @@ pub fn sections() -> CitySections {
         editing.set(None);
     };
 
-    // Your cities: one recycling-list row per city (drag to reorder — the order IS the sidebar
+    // Your cities: one recycling-list row per city (drag to reorder; the order is the sidebar
     // order, persisted with the list), edit loads it into the form, remove deletes it.
     let rows = list(
         items(move || list_sig.get(), |c: &City| c.id.clone()),
         move |slot| {
-            // Recycling rows (docs/list.md): a physical cell REBINDS to different cities as the
-            // list changes or reorders, so actions read the slot's CURRENT key at click time and
-            // the ids re-register reactively (`id_of`) — a build-time key would go stale.
+            // Recycling rows (docs/list.md): a physical cell rebinds to different cities as the
+            // list changes or reorders, so actions read the slot's current key at click time and
+            // the ids re-register reactively (`id_of`); a build-time key would go stale.
             row((
                 label(move || title(&slot.get()).format()).grow(),
                 button(res::str::cities_edit())
@@ -408,7 +408,7 @@ pub fn sections() -> CitySections {
         .id("city-clear");
 
     // One coarse fix is plenty for city-level weather. The explicit permission ask happens
-    // only where the OS HAS one (Apple, Android — day-part-location never prompts by itself,
+    // only where the OS has one (Apple, Android; day-part-location never prompts by itself,
     // docs/location.md). The browser's Permissions API cannot prompt at all: its prompt lives
     // inside the geolocation call, so on web we go straight to the fix and let it ask.
     let locate = button(res::str::cities_use_location())

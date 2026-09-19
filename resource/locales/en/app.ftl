@@ -1,4 +1,4 @@
-# Day Skies — English (default). https://daybrite.dev/docs/localization
+# Day Skies: English (default). https://daybrite.dev/docs/localization
 
 app_title = Day Skies
 app_tagline = Weather
@@ -92,7 +92,7 @@ cities_status_located = Location added
 cities_status_permission = Location permission was not granted
 cities_status_location_failed = Location failed: { $error }
 
-# Settings — About section
+# Settings: About section
 settings_about_section = About
 settings_name_label = Name
 settings_version_label = Version

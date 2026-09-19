@@ -14,7 +14,7 @@ flow:
   - wait_for: { id: hero-temp }
 
   # Establish Celsius before asserting any temperature. The unit persists via day-part-prefs, so
-  # it is INHERITED from whatever ran last — and this script toggles it to Fahrenheit half way
+  # it is inherited from whatever ran last, and this script toggles it to Fahrenheit half way
   # through. Restoring it at the end (which this script also does) is not enough on its own: a run
   # that fails, is cancelled, or has its app killed between the toggle and the restore leaves
   # Fahrenheit in the store, and every later run then fails its first five assertions on a stale
@@ -61,7 +61,7 @@ flow:
   - assert_visible: { id: host-field }
   # The About section: version and the GitHub link render; the build date and link are never
   # asserted by value (date drifts, and tapping the link would open a browser). The theme
-  # picker is NOT asserted — backends without Cap::Appearance hide that section.
+  # picker is not asserted, because backends without Cap::Appearance hide that section.
   - assert_visible: { id: about-version }
   - assert_visible: { id: about-github }
   - assert_visible: { id: language-picker }
@@ -81,7 +81,7 @@ flow:
   # get the fixed 20 °C mock fixture), visit it, then remove it so reruns start from the same
   # list. The preset add is exercised against the default picker selection (San Francisco,
   # already on the list) so the flow needs no synthetic picker select; the location button is
-  # asserted present but never tapped — a real permission prompt would hang an unattended run.
+  # asserted present but never tapped; a real permission prompt would hang an unattended run.
   - navigate: { route: settings }
   - wait_for: { id: city-name }
   - assert_visible: { id: city-locate }

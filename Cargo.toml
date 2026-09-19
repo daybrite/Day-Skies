@@ -24,26 +24,26 @@ mock = ["day/mock"]
 # explicitly via `cargo rustc --crate-type` (a desktop cdylib blows past the windows-gnu PE
 # export cap).
 [lib]
-# A CONSTANT name, not the package's. Every artifact Day stages is named after the LIB target —
-# `libdayapp.a` for the iOS/macOS staticlib, `libdayapp.so` for the Android cdylib, and the
-# `dayapp::` path `src/main.rs` imports — so none of them move when the package is renamed.
+# A constant name, not the package's. Every artifact Day stages is named after the lib target
+# (`libdayapp.a` for the iOS/macOS staticlib, `libdayapp.so` for the Android cdylib, and the
+# `dayapp::` path `src/main.rs` imports), so none of them move when the package is renamed.
 # Renaming this app is a one-line edit to `[package] name` above (DESIGN.md §17.5).
 name = "dayapp"
 crate-type = ["rlib"]
 
 [dependencies]
 # The day framework resolves from git (the crates aren't on crates.io yet). Local development
-# against a checkout goes through the gitignored .cargo/config.toml [patch] — see README.
+# against a checkout goes through the gitignored .cargo/config.toml [patch]; see README.
 day = { git = "https://github.com/daybrite/day.git" }
-# Settings page: the built-in native picker (no arkui backend — the settings page cfg-gates a
+# Settings page: the built-in native picker (no arkui backend; the settings page cfg-gates a
 # toggle there) + persistent preferences.
 day-part-prefs = { git = "https://github.com/daybrite/day.git" }
 day-piece-settings = { git = "https://github.com/daybrite/day.git" }
 # The platform HTTP stack (URLSession / HttpURLConnection / WinHTTP; ureq+rustls only on
-# Linux/OHOS) — system proxies, VPN, and TLS come from the OS, no TLS library in the app.
+# Linux/OHOS); system proxies, VPN, and TLS come from the OS, no TLS library in the app.
 day-part-http = { git = "https://github.com/daybrite/day.git" }
 # Cities page: the "Use current location" one-shot fix (docs/location.md) and the permission
-# ask that must precede it (docs/permissions.md) — location never prompts by itself.
+# ask that must precede it (docs/permissions.md); location never prompts by itself.
 day-part-location = { git = "https://github.com/daybrite/day.git" }
 day-part-permissions = { git = "https://github.com/daybrite/day.git" }
 serde = { version = "1", features = ["derive"] }

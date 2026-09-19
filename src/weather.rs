@@ -6,15 +6,15 @@
 //!
 //! Networking goes through `day-part-http` (day's docs/http.md): the platform HTTP stack on
 //! macOS, iOS, Android, and Windows (system proxies, VPN, and TLS come from the OS), with a
-//! bundled ureq+rustls fallback on Linux and OHOS — this app ships no TLS code of its own.
+//! bundled ureq+rustls fallback on Linux and OHOS; this app ships no TLS code of its own.
 
 use serde::Deserialize;
 
 /// A place we can show weather for: the user's [`City`] model (`cities.rs`). `id` seeds the
-/// deterministic mock data — unknown ids (custom cities) get the fixed default fixture.
+/// deterministic mock data; unknown ids (custom cities) get the fixed default fixture.
 use crate::cities::City;
 
-/// Where the currently-displayed data came from — surfaced in the UI.
+/// Where the currently-displayed data came from, surfaced in the UI.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum DataSource {
     /// A real Open-Meteo response.
@@ -35,7 +35,7 @@ impl std::fmt::Display for WeatherError {
 
 impl std::error::Error for WeatherError {}
 
-/// The processed model the UI renders — unit-agnostic values in °C / km/h / hPa.
+/// The processed model the UI renders: unit-agnostic values in °C / km/h / hPa.
 #[derive(Clone, Debug)]
 pub struct Weather {
     pub source: DataSource,
@@ -81,7 +81,7 @@ pub enum DayName {
     Weekday(u8),
 }
 
-/// The WMO weather-code families we distinguish (https://open-meteo.com/en/docs — `weather_code`).
+/// The WMO weather-code families we distinguish (https://open-meteo.com/en/docs, `weather_code`).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Family {
     Clear,
@@ -111,7 +111,7 @@ impl Family {
 }
 
 // ---------------------------------------------------------------------------
-// Mock / sample fixtures — deterministic, so screenshots are reproducible.
+// Mock / sample fixtures: deterministic, so screenshots are reproducible.
 // ---------------------------------------------------------------------------
 
 /// Is the app forced into deterministic mock mode? Driven by `--env WEATHER_MOCK=1` at launch.
@@ -144,7 +144,7 @@ pub fn mock(place: &City) -> Weather {
     let is_day = (6..20).contains(&hour);
 
     // A smooth diurnal curve peaking mid-afternoon (~15:00), continuous across midnight and
-    // anchored so the current hour equals `base` (the headline temp) — the "Now" cell matches.
+    // anchored so the current hour equals `base` (the headline temp), so the "Now" cell matches.
     let anchor = ((hour as f64 - 15.0) / 24.0 * std::f64::consts::TAU).cos();
     let temp_at = |i: i64| -> f64 {
         let phase = ((hour + i) as f64 - 15.0) / 24.0 * std::f64::consts::TAU;
@@ -219,7 +219,7 @@ fn weekday_index_offset(y: i64, m: i64, d: i64, offset: i64) -> u8 {
 // ---------------------------------------------------------------------------
 
 /// Resolve a place to a full `Weather`. Mock data resolves synchronously (the Resource
-/// eager-poll case); the live path awaits the platform fetch and parses on the UI thread — an
+/// eager-poll case); the live path awaits the platform fetch and parses on the UI thread; an
 /// Open-Meteo payload is tens of KB, so the parse cost there is negligible.
 pub async fn load(place: City, host: String) -> Result<Weather, WeatherError> {
     if is_mock() {
@@ -347,7 +347,7 @@ fn process(api: ApiResp) -> Weather {
     }
 }
 
-/// The forecast URL for a place — 10 days, °C, auto timezone. The host is the user's configured
+/// The forecast URL for a place: 10 days, °C, auto timezone. The host is the user's configured
 /// Open-Meteo-compatible server (settings), defaulting to api.open-meteo.com.
 fn forecast_url(place: &City, host: &str) -> String {
     format!(
@@ -374,7 +374,7 @@ mod net {
         )
         .await
         .map_err(|e| format!("request failed: {e}"))?;
-        // day-part-http treats 4xx/5xx as responses, not errors — surface them here.
+        // day-part-http treats 4xx/5xx as responses, not errors; surface them here.
         if !(200..300).contains(&resp.status) {
             return Err(format!("request failed: HTTP {}", resp.status));
         }

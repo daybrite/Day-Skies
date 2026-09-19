@@ -1,4 +1,4 @@
-//! The weather screen — an Apple-Weather-inspired layout: a hero with the current conditions, an
+//! The weather screen, an Apple-Weather-inspired layout: a hero with the current conditions, an
 //! hourly strip, a 10-day forecast with range bars, and a grid of detail cards. Authored once and
 //! realized natively on every backend; the `nav` in `lib.rs` makes it a sidebar+detail split
 //! on desktop and a push-list on mobile with no branching here.
@@ -95,7 +95,7 @@ pub fn weather_page(place: City, state: Signal<Load<Weather>>) -> impl Piece {
     .align(HAlign::Center)
     .padding(16.0);
 
-    // The sky gradient is a canvas-backed shape layered BEHIND the transparent scroll, so the
+    // The sky gradient is a canvas-backed shape layered behind the transparent scroll, so the
     // backdrop stays fixed while the forecast scrolls over it.
     let backdrop = rectangle()
         .fill_linear(move || match state.get() {
@@ -214,7 +214,7 @@ fn ten_day(w: &Weather) -> impl Piece + use<> {
 
     // One grid row per day (docs/grid.md): the day, icon, precip, and temperature columns size
     // to their widest cell, and the range bar's `grow_w` makes its column take the leftover
-    // width — no hand-tuned widths, and a plain `spacer()` keeps the precip column aligned on
+    // width, so no width is hand-tuned, and a plain `spacer()` keeps the precip column aligned on
     // dry days.
     let rows: Vec<AnyPiece> = w
         .daily
@@ -281,7 +281,7 @@ fn range_bar(low: f64, high: f64, wmin: f64, wmax: f64) -> impl Piece {
         let x0 = ((low - wmin) / span).clamp(0.0, 1.0);
         let x1 = ((high - wmin) / span).clamp(0.0, 1.0);
         let w = (x1 - x0).max(6.0 / size.width);
-        // Cooler at the low end, warmer at the high end — approximate with a two-stop split.
+        // Cooler at the low end, warmer at the high end: approximate with a two-stop split.
         let mid = x0 + w / 2.0;
         vec![
             rounded_rectangle(3.0)
@@ -306,7 +306,7 @@ fn detail_grid(w: &Weather) -> impl Piece + use<> {
     let uv = format!("{}", w.uv.round() as i64);
     let pressure = format!("{} hPa", w.pressure.round() as i64);
     // A real 2-column grid (docs/grid.md): every card grows, so both columns split the width
-    // evenly, and the pressure card — a bare child outside any row — spans the full grid.
+    // evenly, and the pressure card (a bare child outside any row) spans the full grid.
     grid((
         grid_row((
             detail_card(res::str::detail_feels(), move || settings::temp(feels_c)),

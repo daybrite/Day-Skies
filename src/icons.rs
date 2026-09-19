@@ -1,5 +1,5 @@
 //! Original weather glyphs as declarative shape groups (docs/shapes.md): each `weather_icon`
-//! flattens its shapes into ONE canvas leaf — no bundled assets, so they render identically on
+//! flattens its shapes into one canvas leaf with no bundled assets, so they render identically on
 //! every backend and scale cleanly. Geometry is authored in fractional [0,1] coordinates of the
 //! square via `.at`; stroke widths are points derived from the known `size`.
 
@@ -48,7 +48,7 @@ impl Glyph {
     }
 }
 
-// Palette (warm sun, pale moon, soft clouds, cool precipitation) — reads well on the sky tints.
+// Palette (warm sun, pale moon, soft clouds, cool precipitation) that reads well on the sky tints.
 const SUN: Color = Color::hex(0xFFD24A);
 const SUN_CORE: Color = Color::hex(0xFFB300);
 const MOON: Color = Color::hex(0xF3EDD2);
@@ -59,7 +59,7 @@ const SNOW: Color = Color::hex(0xFFFFFF);
 const BOLT: Color = Color::hex(0xFFD24A);
 const FOGLINE: Color = Color::hex(0xE3E9F0);
 
-/// A weather glyph as a square shape group — one canvas leaf sized to `size`.
+/// A weather glyph as a square shape group: one canvas leaf sized to `size`.
 pub fn weather_icon(glyph: Glyph, size: f64) -> impl Piece {
     shape_group(glyph_shapes(glyph, size)).frame(size, size)
 }
