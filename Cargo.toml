@@ -1,6 +1,6 @@
 [package]
 name = "day-skies"
-version = "0.1.7"
+version.workspace = true
 edition = "2024"
 license = "Apache-2.0"
 # Generate typed resource + localization constants (`res::str::…`) from `resource/` on every build.
@@ -54,3 +54,6 @@ day-build = { git = "https://github.com/daybrite/day.git" }
 
 
 [workspace]
+
+[workspace.package]
+version = "0.1.7"
