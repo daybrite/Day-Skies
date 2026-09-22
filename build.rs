@@ -4,7 +4,7 @@
 //! section, from `SOURCE_DATE_EPOCH` when a reproducible-build harness sets it, else now.
 
 fn main() {
-    day_build::generate_resources().expect("day-build: resource codegen");
+    day_build::prebuild_project().expect("day-build: prebuild");
 
     println!("cargo:rerun-if-env-changed=SOURCE_DATE_EPOCH");
     let secs = std::env::var("SOURCE_DATE_EPOCH")
