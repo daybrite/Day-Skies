@@ -20,9 +20,13 @@ flow:
   # Fahrenheit in the store, and every later run then fails its first five assertions on a stale
   # setting rather than on anything it did. CI runs four locales back to back through one store,
   # so one bad run used to poison the rest.
+  # The unit row is a two-way picker where the toolkit draws a segmented control, and on
+  # HarmonyOS a native switch under the same id (src/settings.rs), which a `select` leaves
+  # untouched: the switch is driven as one there.
   - navigate: { route: settings }
   - wait_for: { id: unit-picker }
-  - select: { id: unit-picker, index: 0 }
+  - select: { id: unit-picker, index: 0, skip_on: [arkui] }
+  - toggle: { id: unit-picker, value: false, only_on: [arkui] }
   - navigate: { route: san-francisco }
   - wait_for: { id: hero-temp }
 
@@ -66,14 +70,16 @@ flow:
   - assert_visible: { id: about-github }
   - assert_visible: { id: language-picker }
   - screenshot: settings
-  - select: { id: unit-picker, index: 1 }
+  - select: { id: unit-picker, index: 1, skip_on: [arkui] }
+  - toggle: { id: unit-picker, value: true, only_on: [arkui] }
   - navigate: { route: san-francisco }
   - wait_for: { id: hero-temp }
   - assert_text: { id: hero-temp, text: "64°" }
   - screenshot: san-francisco-fahrenheit
   - navigate: { route: settings }
   - wait_for: { id: unit-picker }
-  - select: { id: unit-picker, index: 0 }
+  - select: { id: unit-picker, index: 0, skip_on: [arkui] }
+  - toggle: { id: unit-picker, value: false, only_on: [arkui] }
   - navigate: { route: san-francisco }
   - assert_text: { id: hero-temp, text: "18°" }
 

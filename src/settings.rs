@@ -122,7 +122,9 @@ pub fn settings_page() -> impl Piece {
     let language_row = day_piece_settings::language_picker(PREF_LOCALE, res::locales::ALL);
     let theme_row = day_piece_settings::appearance_picker(PREF_THEME);
 
-    // The segmented picker has no ArkUI backend yet; HarmonyOS gets a native toggle instead.
+    // ArkUI has no segmented control: day-arkui draws every picker style as its wheel, and a
+    // two-option wheel is a worse row than a switch, so HarmonyOS gets a native toggle instead.
+    // The walkthrough drives it as one there (`toggle:` rather than `select:`, scripts/weather.yaml).
     // One id call for both variants: the branches are cfg-disjoint, so a single
     // call site keeps the dayscript address stable and keeps `day lint`'s duplicate-id check
     // (which reads text, not cfg) from seeing two.

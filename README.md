@@ -58,7 +58,7 @@ publishes the results to the [gallery](https://daybrite.dev/gallery/Day-Skies/).
 
 | Linux · Qt | Web · DOM | HarmonyOS · ArkUI |
 |:---:|:---:|:---:|
-| <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/linux-qt/en/london.png" width="300" alt="London on Qt"></kbd> | <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/web-dom/en/london.png" width="300" alt="London in the browser"></kbd> | <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/harmony-arkui/en/london.png" width="150" alt="London on HarmonyOS"></kbd> |
+| <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/linux-qt/en/london.png" width="300" alt="London on Qt"></kbd> | <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/web-dom/en/london.png" width="300" alt="London in the browser"></kbd> | <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/harmony-arkui/phone/en/london.png" width="150" alt="London on HarmonyOS"></kbd> |
 
 Settings is a native form on each platform, and the Arabic build mirrors the whole layout:
 
