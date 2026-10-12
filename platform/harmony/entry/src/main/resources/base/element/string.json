@@ -1,5 +1,0 @@
-{ "string": [
-  { "name": "module_desc", "value": "Day Skies" },
-  { "name": "EntryAbility_label", "value": "Day Skies" },
-  { "name": "day_perm_reason_location_when_in_use", "value": "Show weather for where you are right now." }
-] }

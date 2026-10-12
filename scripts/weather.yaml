@@ -2,8 +2,8 @@
 #
 # Run against deterministic mock data so screenshots are reproducible across runs and locales:
 #
-#     day launch -p macos-appkit --env WEATHER_MOCK=1 --script scripts/weather.yaml
-#     day launch -p macos-appkit --env WEATHER_MOCK=1 --locale ar --script scripts/weather.yaml
+#     day launch -t macos-appkit --env WEATHER_MOCK=1 --script scripts/weather.yaml
+#     day launch -t macos-appkit --env WEATHER_MOCK=1 --locale ar --script scripts/weather.yaml
 #
 # Screenshots land in build/day/screenshots/<target>/<locale-or-default>/<name>.png
 name: day-skies-walkthrough

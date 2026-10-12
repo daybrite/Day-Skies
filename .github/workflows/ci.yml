@@ -4,24 +4,35 @@ on:
   push:
     branches: ["**"]
     tags: ["v[0-9]+.[0-9]+.[0-9]+*"]
+  # Marking a pre-release as a release (or publishing one) rebuilds the website against it.
+  release:
+    types: [released]
   workflow_dispatch:
   schedule:
     - cron: "30 13 * * *" # daily (UTC)
 
+# The repository's own jobs run this checkout's code with a read-only token. The write grants
+# sit on the job that calls the shared workflow, whose release and Pages jobs alone use them;
+# its build legs, which run this code too, narrow their token to read-only themselves.
 permissions:
-  contents: write # release-asset upload on tag builds
-  pages: write    # web-dom → GitHub Pages (deploy-web)
-  id-token: write # deploy-pages OIDC token (deploy-web)
+  contents: read
 
 jobs:
   app:
-    uses: daybrite/actions/.github/workflows/dayapp.yml@main
+    uses: daybrite/actions/.github/workflows/dayapp.yml@v1
+    permissions:
+      contents: write # release-asset upload on tag builds
+      pages: write    # web-dom → GitHub Pages (deploy-web)
+      id-token: write # deploy-pages OIDC token (deploy-web)
     secrets: inherit
     with:
-      targets: windows-xaml, macos-appkit, linux-gtk, linux-qt, ios-uikit, android-mdc, harmony-arkui, web-dom
-      # main until the next day release: the flatpak/MSIX default-icon fallback (needed by apps
-      # without resource/icons/, like this one) is newer than the latest published CLI.
-      day-version: main
+      targets: windows-winui, macos-appkit, linux-gtk, linux-qt, ios-uikit, android-mdc, harmony-arkui, web-dom
+      # Build against the tip of the day branch the app tracks, not the revision the committed
+      # lock pins: a sample app exists to prove the current framework still builds it, and a
+      # lock left at an older revision would silently stop testing day at all. The revision is
+      # resolved once per run, so every leg compiles the same one. Refresh the lock locally
+      # (`cargo update -p day`) when a new framework API lands, so a local build matches.
+      update-day-deps: true
       scripts: scripts/weather.yaml
       launch-env: WEATHER_MOCK=1
       locales: en fr ar zh-CN
@@ -30,4 +41,3 @@ jobs:
       # to main, with the web build hosted at /Day-Skies/webapp/. deploy-web stays on as the
       # fallback: were website/ ever removed, the bare web app would return to the Pages root.
       deploy-web: true
-      daysite-version: main

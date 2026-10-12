@@ -76,18 +76,18 @@ target the app ships is listed in `Day.toml`.
 
 ```sh
 day doctor                                   # toolchains present and missing, with fixes
-day launch -p macos-appkit                   # build + run with live Open-Meteo data
-day launch -p macos-appkit -p macos-gtk -p macos-qt   # all three desktop toolkits side by side
-day launch -p ios-uikit                      # needs a booted Simulator
-day launch -p android-mdc                    # needs a JDK and a running emulator or device
-day launch -p web-dom                        # serves the WebAssembly build locally
+day launch -t macos-appkit                   # build + run with live Open-Meteo data
+day launch -t macos-appkit -t macos-gtk -t macos-qt   # all three desktop toolkits side by side
+day launch -t ios-uikit                      # needs a booted Simulator
+day launch -t android-mdc                    # needs a JDK and a running emulator or device
+day launch -t web-dom                        # serves the WebAssembly build locally
 ```
 
 Set `WEATHER_MOCK=1` to swap live networking for fixed per-city fixtures. Screenshots and tests
 use it so every run draws the same skies:
 
 ```sh
-day launch -p macos-appkit --env WEATHER_MOCK=1
+day launch -t macos-appkit --env WEATHER_MOCK=1
 ```
 
 ### The walkthrough
@@ -98,8 +98,8 @@ language, and screenshots each city. `scripts/live-check.yaml` confirms a real O
 fills the screen.
 
 ```sh
-day launch -p macos-appkit --env WEATHER_MOCK=1 --script scripts/weather.yaml
-day launch -p macos-appkit --env WEATHER_MOCK=1 --locale ar --script scripts/weather.yaml
+day launch -t macos-appkit --env WEATHER_MOCK=1 --script scripts/weather.yaml
+day launch -t macos-appkit --env WEATHER_MOCK=1 --locale ar --script scripts/weather.yaml
 ```
 
 Captures land in `build/day/screenshots/<target>/<locale>/`. CI runs the same script on all eight
@@ -126,9 +126,20 @@ day patch --local /path/to/day
 - `src/settings.rs` holds the Settings form and the persisted preferences.
 - `src/icons.rs` draws every weather glyph as a group of shapes, so there are no image assets.
 - `resource/locales/` carries the Fluent strings for `en`, `fr`, `ar`, and `zh-CN`.
-- `platform/` holds the thin native host projects the mobile targets build through.
+- `platform/` holds app-owned Apple host sources and any native resource customizations. Day generates the build projects under `build/`.
 
 `day lint` checks routes, element ids, and locale coverage.
 
 Weather data by [Open-Meteo.com](https://open-meteo.com) (CC BY 4.0). Day Skies is open source
 under the Apache-2.0 license.
+
+
+## Generated native projects
+
+Use a Day CLI with automatic native project generation; Apple builds require **Xcode 27
+or newer**. Xcode project documents, Android Gradle files, and HarmonyOS hvigor files are
+created under `build/` by `day prepare`, `day build`, and `day launch`. Open the selected
+project with `day open -t <target>`; edits to generated files are disposable. Apple Swift
+sources, plists and `.xcconfig` files, and any Android resource overlays, remain app-owned
+under `platform/`. For additional native configuration, use
+`day project add-target <target> --persist-native-project` to create a persistent override.
