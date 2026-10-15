@@ -50,18 +50,24 @@ weather_error = Couldn't load weather
 data_attribution = Weather data by Open-Meteo.com
 data_mock = Mock data · screenshot mode
 
-# Settings
-settings_title = Settings
+# Settings ▸ Weather (the General group's strings come from Day's catalog)
 settings_units_section = Units
 settings_unit_label = Temperature
-unit_celsius = Celsius (°C)
-unit_fahrenheit = Fahrenheit (°F)
+unit_celsius = Celsius
+unit_fahrenheit = Fahrenheit
 settings_server_section = Weather server
 settings_host_label = Host
 settings_host_hint = Requests go to this Open-Meteo-compatible server — set your own proxy here, or leave the default.
-settings_save = Save & refresh
+settings_weather = Weather
+settings_weather_subtitle = Units, weather server
+settings_cities = Cities
+settings_cities_count = { $count ->
+    [one] 1 city
+   *[other] { $count } cities
+}
+settings_refresh = Refresh
 
-# Cities management page
+# Settings ▸ Cities (the city editor)
 cities_list_section = Your cities
 cities_add_section = Add a city
 cities_preset_label = Pick a city
@@ -92,16 +98,7 @@ cities_status_located = Location added
 cities_status_permission = Location permission was not granted
 cities_status_location_failed = Location failed: { $error }
 
-# Settings: About section
-settings_about_section = About
-settings_name_label = Name
-settings_version_label = Version
-settings_build_label = Built
-settings_github = Source on GitHub
-
-# Language / appearance settings + the language's own name (res::locales::ALL)
+# The language's own name (the Language row in Settings lists every bundled locale)
 language_name = English
-settings_language_section = Language
-settings_theme_section = Appearance
 
 open_in_new_window = Open in New Window

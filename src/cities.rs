@@ -1,18 +1,19 @@
-//! The user's city list: the model, its persistence, and the city-management form sections
-//! that `settings.rs` composes into the Settings page.
+//! The user's city list: the model, its persistence, and the city editor that `settings.rs`
+//! mounts as the Cities group of the Settings surface.
 //!
-//! The list is a root-lifetime `Signal<Vec<City>>` seeded from day-part-prefs (JSON under one
-//! key) and written back on every mutation. `lib.rs` derives the nav's city items from it,
-//! so adding or removing a city re-derives the native sidebar rows reactively
-//! (https://daybrite.dev/docs/navigation, data-driven items).
+//! The list is a root-lifetime `Signal<Vec<City>>` seeded from one preference (the whole list
+//! as a JSON array, docs/settings.md) and written back on every mutation. `lib.rs` derives the
+//! nav's city items from it, so adding or removing a city re-derives the native sidebar rows
+//! reactively (https://daybrite.dev/docs/navigation, data-driven items).
 
 use crate::res;
 use day::LocalizedText;
 use day::prelude::*;
+use day_piece_settings::Pref;
 use serde::{Deserialize, Serialize};
 
-/// The prefs key holding the whole list as a JSON array.
-const PREF_CITIES: &str = "dayskies.cities";
+/// The whole list as a JSON array under one key; empty (the default) means the preset five.
+static CITIES: Pref<String> = Pref::new("dayskies.cities", String::new);
 
 /// The id the "Use current location" button writes (each fix replaces the previous one).
 pub const MY_LOCATION: &str = "my-location";
@@ -127,11 +128,13 @@ pub struct Cities(Signal<Vec<City>>);
 
 impl Ambient for Cities {
     fn create() -> Self {
-        let seed = match day_part_prefs::get(PREF_CITIES) {
-            // A saved list wins, even an empty one (the user removed every city);
-            // unparseable JSON falls back to the defaults rather than a dead app.
-            Some(json) => serde_json::from_str(&json).unwrap_or_else(|_| defaults()),
-            None => defaults(),
+        let json = CITIES.get_untracked();
+        // A saved list wins, even an empty one (the user removed every city);
+        // unparseable JSON falls back to the defaults rather than a dead app.
+        let seed = if json.is_empty() {
+            defaults()
+        } else {
+            serde_json::from_str(&json).unwrap_or_else(|_| defaults())
         };
         Cities(Signal::new(seed))
     }
@@ -164,7 +167,7 @@ fn update(f: impl FnOnce(&mut Vec<City>)) {
     let mut v = sig.get_untracked();
     f(&mut v);
     if let Ok(json) = serde_json::to_string(&v) {
-        day_part_prefs::set(PREF_CITIES, &json);
+        CITIES.set(json);
     }
     sig.set(v);
 }
@@ -272,19 +275,11 @@ fn parse_coord(s: &str, limit: f64) -> Option<f64> {
     (v.is_finite() && v.abs() <= limit).then_some(v)
 }
 
-/// The city-management form pieces (shared page-scoped signals inside): the current list
-/// (edit/remove per row), the preset catalog + name-and-coordinates form, the
-/// current-location shortcut, and the one-line outcome readout (`city-status`,
-/// walkthrough-asserted). `settings.rs` places the sections in its form and the status line
-/// under it.
-pub struct CitySections {
-    pub list: AnyPiece,
-    pub add: AnyPiece,
-    pub location: AnyPiece,
-    pub status: AnyPiece,
-}
-
-pub fn sections() -> CitySections {
+/// The city editor, the whole Cities page of Settings (shared page-scoped signals inside): the
+/// current list (edit/remove per row), the preset catalog + name-and-coordinates form, the
+/// current-location shortcut, and the one-line outcome readout under them (`city-status`,
+/// walkthrough-asserted).
+pub fn editor() -> impl Piece {
     let list_sig = cities();
     let name = Signal::new(String::new());
     let lat = Signal::new(String::new());
@@ -443,9 +438,10 @@ pub fn sections() -> CitySections {
         })
         .id("city-locate");
 
-    CitySections {
-        list: AnyPiece::new(section((rows,)).title(res::str::cities_list_section())),
-        add: AnyPiece::new(
+    // Sections share the page's label column (docs/forms.md); the status line sits under them.
+    column((
+        form((
+            section((rows,)).title(res::str::cities_list_section()),
             section((
                 labeled(
                     res::str::cities_preset_label(),
@@ -461,11 +457,13 @@ pub fn sections() -> CitySections {
                 row((save, clear)).spacing(8.0),
             ))
             .title(res::str::cities_add_section()),
-        ),
-        location: AnyPiece::new(section((locate,)).title(res::str::cities_location_section())),
-        status: label(move || status.get().text())
+            section((locate,)).title(res::str::cities_location_section()),
+        )),
+        label(move || status.get().text())
             .font(Font::Footnote)
-            .id("city-status")
-            .any(),
-    }
+            .id("city-status"),
+    ))
+    .spacing(12.0)
+    .align(HAlign::Leading)
+    .grow_w()
 }

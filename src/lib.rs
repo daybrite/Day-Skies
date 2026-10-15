@@ -1,10 +1,11 @@
 //! Day Skies, a weather app built with [Day](https://daybrite.dev). `root()` is the whole UI,
 //! shared by every platform. A `nav` over the user's city list is the adaptive shell: a
 //! sidebar + detail split on desktop, a list that pushes the detail on mobile. The list itself
-//! is editable (`cities.rs`) and persists via day-part-prefs; each city's weather lives in its
-//! own reactive signal, fed by the data layer in `weather.rs`.
+//! is editable from Settings (`cities.rs`, `settings.rs`) and persists as a preference; each
+//! city's weather lives in its own reactive signal, fed by the data layer in `weather.rs`.
 
 use day::prelude::*;
+use day_piece_settings::Prefs;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -36,7 +37,10 @@ pub mod res {
 /// App-wide (docs/state.md), not per-window: it is a fetch cache over shared data, and two
 /// windows showing the same city should read one load rather than each starting its own.
 #[derive(Clone)]
-struct Forecasts(Rc<RefCell<Vec<(String, day::reactive::Resource<Weather>)>>>);
+struct Forecasts(Rc<RefCell<Vec<(String, Forecast)>>>);
+
+/// One city's loaded (or loading) weather.
+type Forecast = day::reactive::Resource<Weather>;
 
 impl Ambient for Forecasts {
     fn create() -> Self {
@@ -45,17 +49,17 @@ impl Ambient for Forecasts {
 }
 
 /// Get (creating on first call) the weather resource for a city. The resource TRACKS the
-/// Save-applied host (`settings::host()`), so applying a new host refetches by itself; mock data
-/// resolves synchronously inside the fetcher; the live path awaits the platform fetch through
-/// `fetch_future` (docs/http.md); cancellation and latest-wins ride the Resource.
-fn resource_for(city: &City) -> day::reactive::Resource<Weather> {
+/// forecast host (`settings::host()`), so a server typed into Settings refetches by itself;
+/// mock data resolves synchronously inside the fetcher; the live path awaits the platform fetch
+/// through `fetch_future` (docs/http.md); cancellation and latest-wins ride the Resource.
+fn resource_for(city: &City) -> Forecast {
     let cache = Forecasts::app().0;
     if let Some((_, r)) = cache.borrow().iter().find(|(id, _)| *id == city.id) {
         return *r;
     }
     // Root scope, not the calling page's build scope: the resource must outlive the detail
     // pane that first touched it (a page-scoped resource would be disposed on navigation and
-    // the memoized handle would go dead, the settings Store's app-scope rationale).
+    // the memoized handle would go dead).
     let fetch_city = city.clone();
     let r = day::reactive::Scope::root().enter(|| {
         day::reactive::Resource::new(settings::host, move |host| {
@@ -66,9 +70,8 @@ fn resource_for(city: &City) -> day::reactive::Resource<Weather> {
     r
 }
 
-/// Refetch every city (the settings Save action). Save also writes the applied-host signal the
-/// resources track, so a changed host refetches twice-deduped into one run (both dependencies
-/// dirty in the same drain); an unchanged host still refetches: Save always re-checks.
+/// Refetch every city (the Refresh row in Settings ▸ Weather). A changed host already
+/// refetched through the resources' tracked read; Refresh re-checks against the same host.
 pub(crate) fn reload_all() {
     for (_, r) in Forecasts::app().0.borrow().iter() {
         r.refetch();
@@ -152,21 +155,11 @@ pub fn root() -> impl Piece {
     // Every locale under `resource/locales/` (en, fr, ar, zh-CN), embedded and registered by the
     // generated catalog; adding a language is a new directory, nothing to edit here.
     res::locales::install();
-    // Persisted language/theme overrides, before the first page builds.
-    settings::apply_startup();
-    // The Preferences window (docs/windows.md): the settings page as a singleton window on
-    // desktop (auto Settings…/⌘, menu item), the cover fallback on mobile. The sidebar's
-    // "settings" item keeps working everywhere: same page, two entry points.
-    day::register_preferences_with(
-        day::WindowOptions {
-            title: res::str::settings_title().format(),
-            size: Size::new(560.0, 720.0),
-            min_size: None,
-            app_name: None,
-            ..Default::default()
-        },
-        settings::settings_page,
-    );
+    // Settings and About (docs/settings.md): appearance and language from Day's catalog, the
+    // app's version from the manifest, then this app's Weather and Cities groups. On desktop
+    // this adds the app menu's Settings… and About items and their windows; the handle's page
+    // is also the sidebar's Settings section on every platform (`window_shell`).
+    let prefs = settings::install();
 
     // Create every stored city's resource in the (permanent) root scope and start loading now.
     for city in cities::cities().get_untracked() {
@@ -174,35 +167,44 @@ pub fn root() -> impl Piece {
     }
     // File ▸ New Window (docs/windows.md): the same shell again, which is exactly why the
     // selection lives on a `Scene` rather than in a global; each call gets its own.
-    day::register_new_window(window_shell);
+    let shell_prefs = prefs.clone();
+    day::register_new_window(move || window_shell(shell_prefs.clone()));
 
-    window_shell()
+    window_shell(prefs)
 }
 
+/// The sidebar's Settings key: the conventional one `day_piece_settings::open()` and the
+/// `settings/<group>` routes look for.
+const SETTINGS: &str = day_piece_settings::NAV_KEY;
+
 /// One window's UI: the first window's, and every File ▸ New Window's.
-fn window_shell() -> impl Piece {
+fn window_shell(prefs: Prefs) -> impl Piece {
     let city_list = cities::cities();
     Scene::scoped(move |scene| {
+        let item_prefs = prefs.clone();
         nav(scene.section)
             .style(NavStyle::Sidebar)
             .title(res::str::app_title())
             .header(sidebar_header)
-            // The city rows re-derive whenever the list changes (add/edit/remove on the
-            // Settings page). They keep the floating transparent chrome over the full-bleed sky
-            // (android edge-to-edge); Settings keeps the standard opaque bar.
+            // The city rows re-derive whenever the list changes (add/edit/remove in Settings).
+            // They keep the floating transparent chrome over the full-bleed sky (android
+            // edge-to-edge); Settings keeps the standard opaque bar.
             .items(
                 move || city_list.get(),
                 |c: &City| item(c.id.clone(), cities::title(c)).immersive(),
             )
-            .destination(|id: &Option<String>| match id {
-                Some(id) => Either::Left(city_page_for(id)),
+            // Settings stays a sidebar section on every platform (the desktop menu's Settings…
+            // window is a second way in), so the key is passed unconditionally rather than
+            // through `prefs.nav_keys`, which would drop it where a menu bar exists.
+            .items(
+                || vec![SETTINGS.to_string()],
+                move |k: &String| item_prefs.nav_item(Some(k.clone())),
+            )
+            .destination(move |id: &Option<String>| match id.as_deref() {
+                Some(SETTINGS) => Either::Left(Either::Left(prefs.page())),
+                Some(id) => Either::Left(Either::Right(city_page_for(id))),
                 None => Either::Right(spacer()),
             })
-            .item(
-                "settings".to_string(),
-                res::str::settings_title(),
-                settings::settings_page,
-            )
             .id("nav")
     })
 }

@@ -46,15 +46,18 @@ data_attribution = 天气数据来自 Open-Meteo.com
 data_mock = 模拟数据 · 截图模式
 
 # 设置
-settings_title = 设置
 settings_units_section = 单位
 settings_unit_label = 温度
-unit_celsius = 摄氏 (°C)
-unit_fahrenheit = 华氏 (°F)
+unit_celsius = 摄氏
+unit_fahrenheit = 华氏
 settings_server_section = 天气服务器
 settings_host_label = 主机
 settings_host_hint = 请求将发送到此 Open-Meteo 兼容服务器 — 可填写自己的代理，或保留默认值。
-settings_save = 保存并刷新
+settings_weather = 天气
+settings_weather_subtitle = 单位、天气服务器
+settings_cities = 城市
+settings_cities_count = { $count } 个城市
+settings_refresh = 刷新
 
 # 城市管理页面
 cities_list_section = 你的城市
@@ -88,15 +91,8 @@ cities_status_permission = 未获得位置权限
 cities_status_location_failed = 定位失败：{ $error }
 
 # 设置 — 关于部分
-settings_about_section = 关于
-settings_name_label = 名称
-settings_version_label = 版本
-settings_build_label = 构建日期
-settings_github = GitHub 源代码
 
 # 语言/外观设置 + 语言自称（res::locales::ALL）
 language_name = 简体中文
-settings_language_section = 语言
-settings_theme_section = 外观
 
 open_in_new_window = 在新窗口中打开

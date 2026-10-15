@@ -60,7 +60,8 @@ publishes the results to the [gallery](https://daybrite.dev/gallery/Day-Skies/).
 |:---:|:---:|:---:|
 | <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/linux-qt/en/london.png" width="300" alt="London on Qt"></kbd> | <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/web-dom/en/london.png" width="300" alt="London in the browser"></kbd> | <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/harmony-arkui/phone/en/london.png" width="150" alt="London on HarmonyOS"></kbd> |
 
-Settings is a native form on each platform, and the Arabic build mirrors the whole layout:
+Settings follows each platform's idiom (a toolbar-tab panel on macOS, grouped pages on the
+phones), and the Arabic build mirrors the whole layout:
 
 <p align="center">
   <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/ios-uikit/iphone/en/settings.png" width="200" alt="Settings on iPhone"></kbd>
@@ -123,7 +124,9 @@ day patch --local /path/to/day
   weather-code mapping, and the mock fixtures.
 - `src/ui.rs` is the weather screen: the sky-gradient backdrop, the hero, the hourly strip, the
   ten-day `grid` with its range-bar column, and the detail-card grid.
-- `src/settings.rs` holds the Settings form and the persisted preferences.
+- `src/settings.rs` declares Settings and About (temperature unit, weather server, the city
+  editor as its own group) on the shared settings surface, with the persisted preferences the
+  weather screen reads.
 - `src/icons.rs` draws every weather glyph as a group of shapes, so there are no image assets.
 - `resource/locales/` carries the Fluent strings for `en`, `fr`, `ar`, and `zh-CN`.
 - `platform/` holds app-owned Apple host sources and any native resource customizations. Day generates the build projects under `build/`.

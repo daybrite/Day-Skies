@@ -13,20 +13,19 @@ flow:
   - wait_for: { id: nav }
   - wait_for: { id: hero-temp }
 
-  # Establish Celsius before asserting any temperature. The unit persists via day-part-prefs, so
-  # it is inherited from whatever ran last, and this script toggles it to Fahrenheit half way
+  # Establish Celsius before asserting any temperature. The unit is a persisted preference, so
+  # it is inherited from whatever ran last, and this script switches it to Fahrenheit half way
   # through. Restoring it at the end (which this script also does) is not enough on its own: a run
-  # that fails, is cancelled, or has its app killed between the toggle and the restore leaves
+  # that fails, is cancelled, or has its app killed between the switch and the restore leaves
   # Fahrenheit in the store, and every later run then fails its first five assertions on a stale
   # setting rather than on anything it did. CI runs four locales back to back through one store,
   # so one bad run used to poison the rest.
-  # The unit row is a two-way picker where the toolkit draws a segmented control, and on
-  # HarmonyOS a native switch under the same id (src/settings.rs), which a `select` leaves
-  # untouched: the switch is driven as one there.
-  - navigate: { route: settings }
+  # `settings/<group>` is the settings surface's route (docs/settings.md): on desktop it opens
+  # the Settings window on that group; on the phones and the web it selects the sidebar's
+  # Settings section and pushes the group's page. The unit row is a segmented choice everywhere.
+  - navigate: { route: settings/weather }
   - wait_for: { id: unit-picker }
-  - select: { id: unit-picker, index: 0, skip_on: [arkui] }
-  - toggle: { id: unit-picker, value: false, only_on: [arkui] }
+  - select: { id: unit-picker, index: 0 }
   - navigate: { route: san-francisco }
   - wait_for: { id: hero-temp }
 
@@ -57,38 +56,52 @@ flow:
   - assert_text: { id: hero-temp, text: "12°" }
   - screenshot: sydney
 
-  # Settings: switch to Fahrenheit and verify the temperature labels re-render reactively
-  # (mock San Francisco is 18°C = 64°F), then restore Celsius so reruns stay deterministic
-  # (the unit persists via day-part-prefs).
-  - navigate: { route: settings }
+  # Settings ▸ General: the language row exists everywhere (the appearance row only where the
+  # toolkit honors a runtime override, so it is never asserted). The screenshot is the Settings
+  # window on desktop and the pushed page on the phones and the web.
+  - navigate: { route: settings/general }
+  - wait_for: { id: language-picker }
+  - screenshot: { name: settings, window: day.preferences, only_on: [appkit, gtk, qt, winui, xaml] }
+  - screenshot: { name: settings, skip_on: [appkit, gtk, qt, winui, xaml] }
+
+  # About: the `about` route opens the window on desktop; on the phones and the web the header
+  # card at the top of the settings root page opens the About page. The version comes from the
+  # manifest and is never asserted by value. GNOME shows libadwaita's own About dialog, which
+  # has no Day tree to assert, so the block is skipped there.
+  - navigate: { route: about, only_on: [appkit, qt, winui, xaml] }
+  - navigate: { route: settings, skip_on: [appkit, gtk, qt, winui, xaml] }
+  - tap: { id: settings-about, skip_on: [appkit, gtk, qt, winui, xaml] }
+  - wait_for: { id: about-version, skip_on: [gtk] }
+  - screenshot: { name: about, window: day.about, only_on: [appkit, qt, winui, xaml] }
+  - screenshot: { name: about, skip_on: [appkit, gtk, qt, winui, xaml] }
+  - close_window: { window: day.about, only_on: [appkit, qt, winui, xaml] }
+
+  # Settings ▸ Weather: switch to Fahrenheit and verify the temperature labels re-render
+  # reactively (mock San Francisco is 18°C = 64°F), then restore Celsius so reruns stay
+  # deterministic (the unit is a persisted preference).
+  - navigate: { route: settings/weather }
   - wait_for: { id: unit-picker }
   - assert_visible: { id: host-field }
-  # The About section: version and the GitHub link render; the build date and link are never
-  # asserted by value (date drifts, and tapping the link would open a browser). The theme
-  # picker is not asserted, because backends without Cap::Appearance hide that section.
-  - assert_visible: { id: about-version }
-  - assert_visible: { id: about-github }
-  - assert_visible: { id: language-picker }
-  - screenshot: settings
-  - select: { id: unit-picker, index: 1, skip_on: [arkui] }
-  - toggle: { id: unit-picker, value: true, only_on: [arkui] }
+  - assert_visible: { id: settings-refresh }
+  - screenshot: { name: settings-weather, window: day.preferences, only_on: [appkit, gtk, qt, winui, xaml] }
+  - screenshot: { name: settings-weather, skip_on: [appkit, gtk, qt, winui, xaml] }
+  - select: { id: unit-picker, index: 1 }
   - navigate: { route: san-francisco }
   - wait_for: { id: hero-temp }
   - assert_text: { id: hero-temp, text: "64°" }
   - screenshot: san-francisco-fahrenheit
-  - navigate: { route: settings }
+  - navigate: { route: settings/weather }
   - wait_for: { id: unit-picker }
-  - select: { id: unit-picker, index: 0, skip_on: [arkui] }
-  - toggle: { id: unit-picker, value: false, only_on: [arkui] }
+  - select: { id: unit-picker, index: 0 }
   - navigate: { route: san-francisco }
   - assert_text: { id: hero-temp, text: "18°" }
 
-  # City management (on the Settings page): add a custom city by coordinates (unknown ids
-  # get the fixed 20 °C mock fixture), visit it, then remove it so reruns start from the same
-  # list. The preset add is exercised against the default picker selection (San Francisco,
-  # already on the list) so the flow needs no synthetic picker select; the location button is
-  # asserted present but never tapped; a real permission prompt would hang an unattended run.
-  - navigate: { route: settings }
+  # Settings ▸ Cities: add a custom city by coordinates (unknown ids get the fixed 20 °C mock
+  # fixture), visit it, then remove it so reruns start from the same list. The preset add is
+  # exercised against the default picker selection (San Francisco, already on the list) so the
+  # flow needs no synthetic picker select; the location button is asserted present but never
+  # tapped; a real permission prompt would hang an unattended run.
+  - navigate: { route: settings/cities }
   - wait_for: { id: city-name }
   - assert_visible: { id: city-locate }
   - input: { id: city-name, text: "Testville" }
@@ -101,13 +114,18 @@ flow:
   - assert_text: { id: hero-city, text: "Testville" }
   - assert_text: { id: hero-temp, text: "20°" }
   - screenshot: testville
-  - navigate: { route: settings }
+  # Back to the city editor. The desktop window selects the group by route; the navigation
+  # presentation is still on the Cities page it was left on, so selecting the section is enough
+  # (routing to the group again would push a second copy of the page above the first).
+  - navigate: { route: settings/cities, only_on: [appkit, gtk, qt, winui, xaml] }
+  - navigate: { route: settings, skip_on: [appkit, gtk, qt, winui, xaml] }
   - wait_for: { id: city-name }
   - tap: { id: city-add-preset }
   - assert_text: { id: city-status, key: cities_status_exists }
   # The city rows live in a recycling list (docs/list.md): rows realize lazily as the list
-  # becomes visible, so reveal it before addressing a row that may sit below the fold.
-  - scroll_to: { id: city-rows }
+  # becomes visible, so reveal it before addressing a row that may sit below the fold. The
+  # desktop Settings window fits its page instead of scrolling, so there is nothing to reveal.
+  - scroll_to: { id: city-rows, skip_on: [appkit, gtk, qt, winui, xaml] }
   - tap: { id: city-remove-testville }
   - assert_text: { id: city-status, key: cities_status_removed }
   # Drag-to-reorder rides the same list: move Sydney (index 4) to the top and back, asserting

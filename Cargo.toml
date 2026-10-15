@@ -36,9 +36,8 @@ crate-type = ["rlib"]
 # The day framework resolves from git (the crates aren't on crates.io yet). Local development
 # against a checkout goes through the gitignored .cargo/config.toml [patch]; see README.
 day = { git = "https://github.com/daybrite/day.git" }
-# Settings page: the built-in native picker (no arkui backend; the settings page cfg-gates a
-# toggle there) + persistent preferences.
-day-part-prefs = { git = "https://github.com/daybrite/day.git" }
+# Settings and About (docs/settings.md): typed persisted preferences (unit, host, the city
+# list) and the Settings/About surface in each platform's idiom.
 day-piece-settings = { git = "https://github.com/daybrite/day.git" }
 # The platform HTTP stack (URLSession / HttpURLConnection / WinHTTP; ureq+rustls only on
 # Linux/OHOS); system proxies, VPN, and TLS come from the OS, no TLS library in the app.

@@ -46,15 +46,24 @@ data_attribution = بيانات الطقس من Open-Meteo.com
 data_mock = بيانات وهمية · وضع اللقطات
 
 # الإعدادات
-settings_title = الإعدادات
 settings_units_section = الوحدات
 settings_unit_label = درجة الحرارة
-unit_celsius = مئوية (°C)
-unit_fahrenheit = فهرنهايت (°F)
+unit_celsius = مئوية
+unit_fahrenheit = فهرنهايت
 settings_server_section = خادم الطقس
 settings_host_label = المضيف
 settings_host_hint = تُرسل الطلبات إلى هذا الخادم المتوافق مع Open-Meteo — أدخل الوكيل الخاص بك، أو اترك الافتراضي.
-settings_save = حفظ وتحديث
+settings_weather = الطقس
+settings_weather_subtitle = الوحدات وخادم الطقس
+settings_cities = المدن
+settings_cities_count = { $count ->
+    [zero] لا مدن
+    [one] مدينة واحدة
+    [two] مدينتان
+    [few] { $count } مدن
+   *[other] { $count } مدينة
+}
+settings_refresh = تحديث
 
 # صفحة إدارة المدن
 cities_list_section = مدنك
@@ -88,15 +97,8 @@ cities_status_permission = لم يُمنح إذن الوصول إلى الموق
 cities_status_location_failed = تعذر تحديد الموقع: { $error }
 
 # الإعدادات — قسم حول
-settings_about_section = حول
-settings_name_label = الاسم
-settings_version_label = الإصدار
-settings_build_label = تاريخ البناء
-settings_github = الشيفرة المصدرية على GitHub
 
 # إعدادات اللغة والمظهر + اسم اللغة (res::locales::ALL)
 language_name = العربية
-settings_language_section = اللغة
-settings_theme_section = المظهر
 
 open_in_new_window = فتح في نافذة جديدة

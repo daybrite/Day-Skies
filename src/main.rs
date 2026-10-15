@@ -8,6 +8,9 @@ fn main() {
             size: day::prelude::Size::new(960.0, 640.0),
             min_size: Some(day::prelude::Size::new(620.0, 480.0)),
             app_name: Some("Day Skies".into()),
+            // About reads the version from here on desktop; the mobile entry points stamp it
+            // through `day_start!`.
+            version: Some(env!("CARGO_PKG_VERSION").into()),
             ..Default::default()
         },
         dayapp::root,

@@ -46,15 +46,21 @@ data_attribution = Données météo par Open-Meteo.com
 data_mock = Données fictives · mode capture
 
 # Réglages
-settings_title = Réglages
 settings_units_section = Unités
 settings_unit_label = Température
-unit_celsius = Celsius (°C)
-unit_fahrenheit = Fahrenheit (°F)
+unit_celsius = Celsius
+unit_fahrenheit = Fahrenheit
 settings_server_section = Serveur météo
 settings_host_label = Hôte
 settings_host_hint = Les requêtes vont vers ce serveur compatible Open-Meteo — indiquez votre propre proxy, ou laissez la valeur par défaut.
-settings_save = Enregistrer et actualiser
+settings_weather = Météo
+settings_weather_subtitle = Unités, serveur météo
+settings_cities = Villes
+settings_cities_count = { $count ->
+    [one] 1 ville
+   *[other] { $count } villes
+}
+settings_refresh = Actualiser
 
 # Page de gestion des villes
 cities_list_section = Vos villes
@@ -88,15 +94,8 @@ cities_status_permission = L'accès à la position n'a pas été accordé
 cities_status_location_failed = Échec de la localisation : { $error }
 
 # Réglages — section À propos
-settings_about_section = À propos
-settings_name_label = Nom
-settings_version_label = Version
-settings_build_label = Compilé le
-settings_github = Code source sur GitHub
 
 # Réglages langue / apparence + le nom de la langue (res::locales::ALL)
 language_name = Français
-settings_language_section = Langue
-settings_theme_section = Apparence
 
 open_in_new_window = Ouvrir dans une nouvelle fenêtre
