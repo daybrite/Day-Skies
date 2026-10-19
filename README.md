@@ -54,7 +54,7 @@ publishes the results to the [gallery](https://daybrite.dev/gallery/Day-Skies/).
 
 | macOS · AppKit | Windows · XAML | Linux · GTK |
 |:---:|:---:|:---:|
-| <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/macos-appkit/en/new-york.png" width="300" alt="New York on macOS"></kbd> | <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/windows-xaml/en/new-york.png" width="300" alt="New York on Windows"></kbd> | <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/linux-gtk/en/new-york.png" width="300" alt="New York on GTK"></kbd> |
+| <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/macos-appkit/en/new-york.png" width="300" alt="New York on macOS"></kbd> | <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/windows-winui/en/new-york.png" width="300" alt="New York on Windows"></kbd> | <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/linux-gtk/en/new-york.png" width="300" alt="New York on GTK"></kbd> |
 
 | Linux · Qt | Web · DOM | HarmonyOS · ArkUI |
 |:---:|:---:|:---:|
