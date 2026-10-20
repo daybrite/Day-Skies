@@ -197,7 +197,7 @@ fn window_shell(prefs: Prefs) -> impl Piece {
                 Some(id) => Either::Left(city_page_for(id)),
                 None => Either::Right(spacer()),
             })
-            .id("nav")
+            .id(day::id!(nav))
     })
 }
 
@@ -205,7 +205,7 @@ fn sidebar_header() -> impl Piece {
     column((
         label(res::str::app_title())
             .font(Font::Headline)
-            .id("app-title"),
+            .id(day::id!(app_title)),
         label(res::str::app_tagline()).font(Font::Caption),
     ))
     .spacing(2.0)

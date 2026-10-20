@@ -3,12 +3,12 @@ description: The Settings and About windows (docs/settings.md, desktop combos) â
   menu's Settingsâ€¦ item opens the settings panel on its first group, the About item its
   window; the same ids the walkthrough asserts resolve inside them.
 flow:
-  - wait_for: { id: hero-city }
+  - wait_for: { id: hero_city }
   - menu: { key: day-preferences }
-  - wait_for: { id: language-picker }
+  - wait_for: { id: language_picker }
   - screenshot: { name: prefs-window, window: day.preferences }
   - close_window: { window: day.preferences }
   - menu: { key: day-about }
-  - wait_for: { id: about-version }
+  - wait_for: { id: about_version }
   - screenshot: { name: about-window, window: day.about }
   - close_window: { window: day.about }

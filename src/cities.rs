@@ -319,13 +319,13 @@ pub fn editor() -> impl Piece {
                         editing.set(Some(c.id));
                         status.set(Status::Idle);
                     })
-                    .id_of(move || format!("city-edit-{}", slot.field(|c| c.id.clone()))),
+                    .id_of(move || day::id!(city_edit, slot.field(|c| c.id.clone()))),
                 button(res::str::cities_remove())
                     .action(move || {
                         remove(&slot.key());
                         status.set(Status::Removed);
                     })
-                    .id_of(move || format!("city-remove-{}", slot.field(|c| c.id.clone()))),
+                    .id_of(move || day::id!(city_remove, slot.field(|c| c.id.clone()))),
             ))
             .spacing(Space::S)
             .padding(Insets::horizontal(4.0))
@@ -333,7 +333,7 @@ pub fn editor() -> impl Piece {
     )
     .row_height(RowHeight::Uniform(44.0))
     .reorderable(Reorder::new(move_city))
-    .id("city-rows")
+    .id(day::id!(city_rows))
     .height(280.0);
 
     // Add from the catalog. The picker's options are fixed, so already-added cities answer
@@ -357,7 +357,7 @@ pub fn editor() -> impl Piece {
             });
             status.set(Status::Saved);
         })
-        .id("city-add-preset");
+        .id(day::id!(city_add_preset));
 
     // Save: update the city being edited, else add a new one under a slug id.
     let save = button(res::str::cities_save())
@@ -395,14 +395,14 @@ pub fn editor() -> impl Piece {
             status.set(Status::Saved);
         })
         .prominent()
-        .id("city-save");
+        .id(day::id!(city_save));
 
     let clear = button(res::str::cities_clear())
         .action(move || {
             clear_form();
             status.set(Status::Idle);
         })
-        .id("city-clear");
+        .id(day::id!(city_clear));
 
     // One coarse fix is plenty for city-level weather. The explicit permission ask happens
     // only where the OS has one (Apple, Android; day-part-location never prompts by itself,
@@ -438,7 +438,7 @@ pub fn editor() -> impl Piece {
                 }
             });
         })
-        .id("city-locate");
+        .id(day::id!(city_locate));
 
     // Sections share the page's label column (docs/forms.md); the status line sits under them.
     column((
@@ -447,15 +447,21 @@ pub fn editor() -> impl Piece {
             section((
                 labeled(
                     res::str::cities_preset_label(),
-                    picker(preset, preset_names).id("city-preset-picker"),
+                    picker(preset, preset_names).id(day::id!(city_preset_picker)),
                 ),
                 add_preset,
                 labeled(
                     res::str::cities_name_label(),
-                    text_field(name).id("city-name"),
+                    text_field(name).id(day::id!(city_name)),
                 ),
-                labeled(res::str::cities_lat_label(), text_field(lat).id("city-lat")),
-                labeled(res::str::cities_lon_label(), text_field(lon).id("city-lon")),
+                labeled(
+                    res::str::cities_lat_label(),
+                    text_field(lat).id(day::id!(city_lat)),
+                ),
+                labeled(
+                    res::str::cities_lon_label(),
+                    text_field(lon).id(day::id!(city_lon)),
+                ),
                 row((save, clear)).spacing(Space::S),
             ))
             .title(res::str::cities_add_section()),
@@ -463,7 +469,7 @@ pub fn editor() -> impl Piece {
         )),
         label(move || status.get().text())
             .font(Font::Footnote)
-            .id("city-status"),
+            .id(day::id!(city_status)),
     ))
     .spacing(Space::M)
     .align(HAlign::Leading)

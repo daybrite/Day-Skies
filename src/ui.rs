@@ -112,19 +112,19 @@ fn hero(place: &City, w: &Weather) -> impl Piece + use<> {
         label(crate::cities::title(place))
             .font(Font::Title)
             .color(TEXT)
-            .id("hero-city"),
+            .id(day::id!(hero_city)),
         weather_icon(glyph, 104.0),
         {
             let t = w.temp;
             label(move || settings::temp(t))
                 .font(Font::System(80.0))
                 .color(TEXT)
-                .id("hero-temp")
+                .id(day::id!(hero_temp))
         },
         label(condition_label(w.family))
             .font(Font::Title3)
             .color(TEXT)
-            .id("hero-condition"),
+            .id(day::id!(hero_condition)),
         {
             let (h, l) = (w.high, w.low);
             label(move || {
@@ -136,7 +136,7 @@ fn hero(place: &City, w: &Weather) -> impl Piece + use<> {
             })
             .font(Font::Headline)
             .color(TEXT)
-            .id("hero-hilo")
+            .id(day::id!(hero_hilo))
         },
     ))
     .spacing(6.0)
@@ -182,7 +182,7 @@ fn hourly_strip(w: &Weather) -> impl Piece + use<> {
         .spacing(10.0)
         .align(HAlign::Leading),
     )
-    .id("hourly")
+    .id(day::id!(hourly))
 }
 
 fn ten_day(w: &Weather) -> impl Piece + use<> {
@@ -237,7 +237,7 @@ fn ten_day(w: &Weather) -> impl Piece + use<> {
         .spacing(10.0)
         .align(HAlign::Leading),
     )
-    .id("ten-day")
+    .id(day::id!(ten_day))
 }
 
 /// A temperature range bar: a faint full-width track with a warm-to-cool segment for this day's
@@ -317,7 +317,7 @@ fn footer(w: &Weather) -> impl Piece + use<> {
             label(res::str::data_mock())
                 .font(Font::Caption2)
                 .color(TEXT2)
-                .id("data-source")
+                .id(day::id!(data_source))
         }),
         label(res::str::data_attribution())
             .font(Font::Caption2)
@@ -341,7 +341,7 @@ fn loading_view() -> impl Piece {
     column((label(res::str::weather_loading())
         .font(Font::Headline)
         .color(TEXT)
-        .id("loading"),))
+        .id(day::id!(loading)),))
     .align(HAlign::Center)
     .padding(40.0)
 }
@@ -351,7 +351,7 @@ fn failed_view(msg: String) -> impl Piece {
         label(res::str::weather_error())
             .font(Font::Headline)
             .color(TEXT)
-            .id("error"),
+            .id(day::id!(error)),
         label(msg).font(Font::Caption).color(TEXT2),
     ))
     .spacing(Space::S)

@@ -6,7 +6,7 @@ name: day-skies-live
 description: Verify the real Open-Meteo fetch populates the UI (no mock).
 flow:
   - wait_for: { id: nav }
-  - wait_for: { id: hero-temp }
+  - wait_for: { id: hero_temp }
   - assert_visible: { id: hourly }
-  - assert_visible: { id: ten-day }
+  - assert_visible: { id: ten_day }
   - screenshot: live-san-francisco

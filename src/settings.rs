@@ -73,14 +73,14 @@ pub fn install() -> Prefs {
         ],
     )
     .segmented()
-    .id("unit-picker");
+    .id(day::id!(unit_picker));
     let server = rows::text(&HOST, res::str::settings_host_label())
         .placeholder(DEFAULT_HOST)
-        .id("host-field");
+        .id(day::id!(host_field));
     // Refresh re-checks every city against the current host; a changed host already refetched
     // through the resources' tracked read of `host()`.
-    let refresh =
-        rows::action(res::str::settings_refresh(), crate::reload_all).id("settings-refresh");
+    let refresh = rows::action(res::str::settings_refresh(), crate::reload_all)
+        .id(day::id!(settings_refresh));
 
     Preferences::new()
         .about(
