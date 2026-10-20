@@ -68,32 +68,11 @@ pub fn sky(family: crate::weather::Family, is_day: bool) -> LinearGradient {
 
 /// The whole page for one place, driven by its reactive `Load<Weather>` signal (docs/async.md).
 pub fn weather_page(place: City, state: Signal<Load<Weather>>) -> impl Piece {
-    let content = column((
-        when(move || state.with(|s| s.is_loading()), loading_view),
-        when(
-            move || state.with(|s| s.error().is_some()),
-            move || {
-                let msg = state
-                    .get_untracked()
-                    .error()
-                    .map(|e| e.to_string())
-                    .unwrap_or_default();
-                failed_view(msg)
-            },
-        ),
-        when(
-            move || state.with(|s| s.is_ready()),
-            // `Either` rather than erasing both arms: the ready view is the real content and
-            // the fallback is a spacer the `when` above never actually shows.
-            move || match state.get_untracked() {
-                Load::Ready(w) => Either::Left(loaded_view(&place, &w)),
-                _ => Either::Right(spacer()),
-            },
-        ),
-    ))
-    .spacing(18.0)
+    let content = column((load(state, move |w| loaded_view(&place, &w.get()))
+        .loading(loading_view)
+        .failed(|e| failed_view(e.to_string())),))
     .align(HAlign::Center)
-    .padding(16.0);
+    .padding(Space::L);
 
     // The sky gradient is a canvas-backed shape layered behind the transparent scroll, so the
     // backdrop stays fixed while the forecast scrolls over it.
@@ -109,11 +88,7 @@ pub fn weather_page(place: City, state: Signal<Load<Weather>>) -> impl Piece {
     let inset = day::safe_area();
     zstack((
         backdrop,
-        scroll(content.padding(Insets {
-            top: inset.top,
-            ..Insets::ZERO
-        }))
-        .grow(),
+        scroll(content.padding(Insets::top(inset.top))).grow(),
     ))
     .grow()
 }
@@ -153,7 +128,11 @@ fn hero(place: &City, w: &Weather) -> impl Piece + use<> {
         {
             let (h, l) = (w.high, w.low);
             label(move || {
-                res::str::weather_hilo(settings::temp_value(h), settings::temp_value(l)).format()
+                res::str::weather_hilo(res::str::WeatherHilo {
+                    high: settings::temp_value(h),
+                    low: settings::temp_value(l),
+                })
+                .format()
             })
             .font(Font::Headline)
             .color(TEXT)
@@ -162,7 +141,7 @@ fn hero(place: &City, w: &Weather) -> impl Piece + use<> {
     ))
     .spacing(6.0)
     .align(HAlign::Center)
-    .padding(8.0)
+    .padding(Space::S)
 }
 
 fn section_header(text: LocalizedText) -> impl Piece {
@@ -170,18 +149,17 @@ fn section_header(text: LocalizedText) -> impl Piece {
 }
 
 fn hourly_strip(w: &Weather) -> impl Piece + use<> {
-    let cells: Vec<AnyPiece> = w
+    let cells: Vec<_> = w
         .hourly
         .iter()
         .take(8)
         .map(|h| {
-            let head: AnyPiece = match &h.hour_label {
-                None => label(res::str::weather_now())
-                    .font(Font::Caption)
-                    .color(TEXT)
-                    .any(),
-                Some(hh) => label(hh.clone()).font(Font::Caption).color(TEXT).any(),
-            };
+            let head = match &h.hour_label {
+                None => label(res::str::weather_now()),
+                Some(hh) => label(hh.clone()),
+            }
+            .font(Font::Caption)
+            .color(TEXT);
             let t = h.temp;
             column((
                 head,
@@ -193,14 +171,13 @@ fn hourly_strip(w: &Weather) -> impl Piece + use<> {
             .spacing(6.0)
             .align(HAlign::Center)
             .grow_w()
-            .any()
         })
         .collect();
 
     card(
         column((
             section_header(res::str::weather_hourly()),
-            row(PieceVec(cells)).spacing(2.0),
+            row(cells).spacing(2.0),
         ))
         .spacing(10.0)
         .align(HAlign::Leading),
@@ -214,20 +191,17 @@ fn ten_day(w: &Weather) -> impl Piece + use<> {
 
     // One grid row per day (docs/grid.md): the day, icon, precip, and temperature columns size
     // to their widest cell, and the range bar's `grow_w` makes its column take the leftover
-    // width, so no width is hand-tuned, and a plain `spacer()` keeps the precip column aligned on
-    // dry days.
-    let rows: Vec<AnyPiece> = w
+    // width, so no width is hand-tuned; an empty cell keeps the precip column aligned on dry
+    // days.
+    let rows: Vec<_> = w
         .daily
         .iter()
         .map(|d| {
-            let precip: AnyPiece = if d.precip > 0 {
+            let precip = (d.precip > 0).then(|| {
                 label(format!("{}%", d.precip))
                     .font(Font::Caption)
                     .color(PRECIP)
-                    .any()
-            } else {
-                spacer().any()
-            };
+            });
             grid_row((
                 label(day_label(d.name)).font(Font::Body).color(TEXT),
                 weather_icon(Glyph::of(d.family, true), 26.0),
@@ -248,16 +222,15 @@ fn ten_day(w: &Weather) -> impl Piece + use<> {
                         .grid_align(Alignment::Trailing)
                 },
             ))
-            .any()
         })
         .collect();
 
     card(
         column((
             section_header(res::str::weather_10day()),
-            grid(PieceVec(rows))
-                .column_spacing(8.0)
-                .row_spacing(12.0)
+            grid(rows)
+                .column_spacing(Space::S)
+                .row_spacing(Space::M)
                 .align(Alignment::Leading)
                 .grow_w(),
         ))
@@ -322,7 +295,7 @@ fn detail_grid(w: &Weather) -> impl Piece + use<> {
         )),
         detail_card(res::str::detail_pressure(), pressure),
     ))
-    .spacing(12.0)
+    .spacing(Space::M)
     .align(Alignment::TopLeading)
     .grow_w()
 }
@@ -333,38 +306,32 @@ fn detail_card<M>(title: LocalizedText, value: impl IntoText<M>) -> impl Piece {
             label(title).font(Font::Caption).color(TEXT2),
             label(value).font(Font::Title2).color(TEXT),
         ))
-        .spacing(8.0)
+        .spacing(Space::S)
         .align(HAlign::Leading),
     )
 }
 
 fn footer(w: &Weather) -> impl Piece + use<> {
-    let mut items: Vec<AnyPiece> = Vec::new();
-    if w.source == DataSource::Mock {
-        items.push(
+    column((
+        (w.source == DataSource::Mock).then(|| {
             label(res::str::data_mock())
                 .font(Font::Caption2)
                 .color(TEXT2)
                 .id("data-source")
-                .any(),
-        );
-    }
-    items.push(
+        }),
         label(res::str::data_attribution())
             .font(Font::Caption2)
-            .color(TEXT2)
-            .any(),
-    );
-    column(PieceVec(items))
-        .spacing(2.0)
-        .align(HAlign::Center)
-        .padding(6.0)
+            .color(TEXT2),
+    ))
+    .spacing(2.0)
+    .align(HAlign::Center)
+    .padding(6.0)
 }
 
 /// Wrap content in a translucent rounded card.
 fn card(inner: impl Piece) -> impl Piece {
     inner
-        .padding(16.0)
+        .padding(Space::L)
         .background(CARD)
         .corner_radius(18.0)
         .grow_w()
@@ -387,7 +354,7 @@ fn failed_view(msg: String) -> impl Piece {
             .id("error"),
         label(msg).font(Font::Caption).color(TEXT2),
     ))
-    .spacing(8.0)
+    .spacing(Space::S)
     .align(HAlign::Center)
     .padding(40.0)
 }

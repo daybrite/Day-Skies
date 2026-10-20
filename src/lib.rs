@@ -110,32 +110,25 @@ impl Ambient for Scene {
 
 fn city_page(city: City) -> impl Piece {
     let state = resource_for(&city).signal();
-    let page = ui::weather_page(city.clone(), state);
+    let id = city.id.clone();
+    let title = city.name.clone();
     // Desktop (docs/windows.md): right-click ▸ Open in New Window: a per-city Normal
     // window (same-kind windows group as native macOS tabs). `city_page_for` re-resolves
     // by id, so the window follows the live list.
-    if capability(Cap::MultiWindow) == Support::Unsupported {
-        return Either::Left(page);
-    }
-    let id = city.id.clone();
-    let title = city.name.clone();
-    Either::Right(page.context_menu(vec![
-        menu_item(res::str::open_in_new_window().format()).action(move || {
-            let id = id.clone();
-            day::open_window(
-                None,
-                day::WindowOptions {
-                    title: title.clone(),
-                    size: Size::new(700.0, 800.0),
-                    min_size: None,
-                    app_name: None,
-                    ..Default::default()
-                },
-                day::WindowKind::Normal,
-                move || city_page_for(&id),
-            );
-        }),
-    ]))
+    ui::weather_page(city, state).apply_if(
+        capability(Cap::MultiWindow) != Support::Unsupported,
+        move |page| {
+            page.context_menu([menu_item(res::str::open_in_new_window()).action(move || {
+                let id = id.clone();
+                day::open_window(
+                    day::WindowOptions::default()
+                        .title(title.clone())
+                        .size(700.0, 800.0),
+                    move || city_page_for(&id),
+                );
+            })])
+        },
+    )
 }
 
 /// The `.destination` for a data-driven city key: look the city up in the live list. A key that
@@ -181,28 +174,27 @@ const SETTINGS: &str = day_piece_settings::NAV_KEY;
 fn window_shell(prefs: Prefs) -> impl Piece {
     let city_list = cities::cities();
     Scene::scoped(move |scene| {
-        let item_prefs = prefs.clone();
+        let title_prefs = prefs.clone();
         nav(scene.section)
             .style(NavStyle::Sidebar)
             .title(res::str::app_title())
             .header(sidebar_header)
-            // The city rows re-derive whenever the list changes (add/edit/remove in Settings).
-            // They keep the floating transparent chrome over the full-bleed sky (android
-            // edge-to-edge); Settings keeps the standard opaque bar.
-            .items(
-                move || city_list.get(),
-                |c: &City| item(c.id.clone(), cities::title(c)).immersive(),
-            )
-            // Settings stays a sidebar section on every platform (the desktop menu's Settings…
-            // window is a second way in), so the key is passed unconditionally rather than
-            // through `prefs.nav_keys`, which would drop it where a menu bar exists.
-            .items(
-                || vec![SETTINGS.to_string()],
-                move |k: &String| item_prefs.nav_item(Some(k.clone())),
-            )
+            .items((
+                // The city rows re-derive whenever the list changes (add/edit/remove in
+                // Settings). They keep the floating transparent chrome over the full-bleed sky
+                // (android edge-to-edge); Settings keeps the standard opaque bar.
+                nav_items(
+                    move || city_list.get(),
+                    |c: &City| item(c.id.clone(), cities::title(c)).immersive(),
+                ),
+                // Settings stays a sidebar section on every platform (the desktop menu's
+                // Settings… window is a second way in), so the item is built here rather than
+                // through `prefs.nav_item`, which answers `None` where a menu bar exists.
+                item(Some(SETTINGS.to_string()), move || title_prefs.title())
+                    .page(move || prefs.page()),
+            ))
             .destination(move |id: &Option<String>| match id.as_deref() {
-                Some(SETTINGS) => Either::Left(Either::Left(prefs.page())),
-                Some(id) => Either::Left(Either::Right(city_page_for(id))),
+                Some(id) => Either::Left(city_page_for(id)),
                 None => Either::Right(spacer()),
             })
             .id("nav")
@@ -218,5 +210,5 @@ fn sidebar_header() -> impl Piece {
     ))
     .spacing(2.0)
     .align(HAlign::Leading)
-    .padding(12.0)
+    .padding(Space::M)
 }

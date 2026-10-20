@@ -287,7 +287,7 @@ pub fn editor() -> impl Piece {
     // Which city the form is editing; `None` = the Save button adds a new one.
     let editing: Signal<Option<String>> = Signal::new(None);
     let status = Signal::new(Status::Idle);
-    let preset_ix = Signal::new(0usize);
+    let preset = Signal::new(PRESETS[0].id);
 
     let clear_form = move || {
         name.set(String::new());
@@ -327,22 +327,24 @@ pub fn editor() -> impl Piece {
                     })
                     .id_of(move || format!("city-remove-{}", slot.field(|c| c.id.clone()))),
             ))
-            .spacing(8.0)
-            .padding(Insets::symmetric(4.0, 0.0))
+            .spacing(Space::S)
+            .padding(Insets::horizontal(4.0))
         },
     )
     .row_height(RowHeight::Uniform(44.0))
-    .reorderable(true)
-    .on_reorder(move_city)
+    .reorderable(Reorder::new(move_city))
     .id("city-rows")
     .height(280.0);
 
     // Add from the catalog. The picker's options are fixed, so already-added cities answer
     // with the "already on your list" status instead of duplicating.
-    let preset_names: Vec<String> = PRESETS.iter().map(|p| (p.name)().format()).collect();
+    let preset_names: Vec<_> = PRESETS.iter().map(|p| (p.id, (p.name)())).collect();
     let add_preset = button(res::str::cities_add_preset())
         .action(move || {
-            let p = &PRESETS[preset_ix.get_untracked().min(PRESETS.len() - 1)];
+            let chosen = preset.get_untracked();
+            let Some(p) = PRESETS.iter().find(|p| p.id == chosen) else {
+                return;
+            };
             if list_sig.get_untracked().iter().any(|c| c.id == p.id) {
                 status.set(Status::Exists);
                 return;
@@ -445,7 +447,7 @@ pub fn editor() -> impl Piece {
             section((
                 labeled(
                     res::str::cities_preset_label(),
-                    picker(preset_names, preset_ix).id("city-preset-picker"),
+                    picker(preset, preset_names).id("city-preset-picker"),
                 ),
                 add_preset,
                 labeled(
@@ -454,7 +456,7 @@ pub fn editor() -> impl Piece {
                 ),
                 labeled(res::str::cities_lat_label(), text_field(lat).id("city-lat")),
                 labeled(res::str::cities_lon_label(), text_field(lon).id("city-lon")),
-                row((save, clear)).spacing(8.0),
+                row((save, clear)).spacing(Space::S),
             ))
             .title(res::str::cities_add_section()),
             section((locate,)).title(res::str::cities_location_section()),
@@ -463,7 +465,7 @@ pub fn editor() -> impl Piece {
             .font(Font::Footnote)
             .id("city-status"),
     ))
-    .spacing(12.0)
+    .spacing(Space::M)
     .align(HAlign::Leading)
     .grow_w()
 }
