@@ -1,4 +1,4 @@
-# Day.toml, the Day project manifest (https://daybrite.dev/docs/cli).
+# Day.toml, the Day project manifest (https://daybrite.dev/docs/reference/cli).
 #
 # `name` and `version` come from Cargo.toml's [package]; they are never restated here.
 # Any [app] property can be overridden per platform ([app.ios]), per toolkit ([app.qt]),

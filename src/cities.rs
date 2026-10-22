@@ -4,7 +4,7 @@
 //! The list is a root-lifetime `Signal<Vec<City>>` seeded from one preference (the whole list
 //! as a JSON array, docs/settings.md) and written back on every mutation. `lib.rs` derives the
 //! nav's city items from it, so adding or removing a city re-derives the native sidebar rows
-//! reactively (https://daybrite.dev/docs/navigation, data-driven items).
+//! reactively (https://daybrite.dev/docs/how-to/navigation, data-driven items).
 
 use crate::res;
 use day::LocalizedText;

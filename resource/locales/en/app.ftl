@@ -1,4 +1,4 @@
-# Day Skies: English (default). https://daybrite.dev/docs/localization
+# Day Skies: English (default). https://daybrite.dev/docs/how-to/localization
 
 app_title = Day Skies
 app_tagline = Weather
