@@ -86,8 +86,8 @@ pub fn install() -> Prefs {
         .about(
             About::from_manifest()
                 .tagline(res::str::app_tagline())
-                .link(day::tr("day-about-website"), "https://daybrite.dev")
-                .link(day::tr("day-about-source"), SOURCE_URL),
+                .link(res::str::day_about_website(), "https://daybrite.dev")
+                .link(res::str::day_about_source(), SOURCE_URL),
         )
         .group(general_group(res::locales::ALL))
         .group(

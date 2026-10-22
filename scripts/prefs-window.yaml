@@ -4,11 +4,11 @@ description: The Settings and About windows (docs/settings.md, desktop combos) â
   window; the same ids the walkthrough asserts resolve inside them.
 flow:
   - wait_for: { id: hero_city }
-  - menu: { key: day-preferences }
+  - menu: { key: day_preferences }
   - wait_for: { id: language_picker }
   - screenshot: { name: prefs-window, window: day.preferences }
   - close_window: { window: day.preferences }
-  - menu: { key: day-about }
+  - menu: { key: day_about }
   - wait_for: { id: about_version }
   - screenshot: { name: about-window, window: day.about }
   - close_window: { window: day.about }
