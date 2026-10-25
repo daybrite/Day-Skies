@@ -6,9 +6,9 @@ iPhone, Android, Mac, Windows, Linux, HarmonyOS, and the web.
 
 <p align="center">
   <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/ios-uikit/iphone/en/san-francisco.png" width="200" alt="San Francisco on iPhone"></kbd>
-  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/android-mdc/phone/en/london.png" width="200" alt="London on Android"></kbd>
+  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/android-material/phone/en/london.png" width="200" alt="London on Android"></kbd>
   <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/ios-uikit/iphone/en/tokyo.png" width="200" alt="Tokyo on iPhone"></kbd>
-  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/android-mdc/phone/en/sydney.png" width="200" alt="Sydney on Android"></kbd>
+  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/android-material/phone/en/sydney.png" width="200" alt="Sydney on Android"></kbd>
 </p>
 
 ## Run it in one command
@@ -65,9 +65,9 @@ phones), and the Arabic build mirrors the whole layout:
 
 <p align="center">
   <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/ios-uikit/iphone/en/settings.png" width="200" alt="Settings on iPhone"></kbd>
-  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/android-mdc/phone/en/settings.png" width="200" alt="Settings on Android"></kbd>
+  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/android-material/phone/en/settings.png" width="200" alt="Settings on Android"></kbd>
   <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/ios-uikit/iphone/ar/san-francisco.png" width="200" alt="San Francisco in Arabic on iPhone"></kbd>
-  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/android-mdc/phone/zh-CN/tokyo.png" width="200" alt="Tokyo in Simplified Chinese on Android"></kbd>
+  <kbd><img src="https://daybrite.github.io/Day-Skies/gallery/android-material/phone/zh-CN/tokyo.png" width="200" alt="Tokyo in Simplified Chinese on Android"></kbd>
 </p>
 
 ## Build from a clone
@@ -80,7 +80,7 @@ day doctor                                   # toolchains present and missing, w
 day launch -t macos-appkit                   # build + run with live Open-Meteo data
 day launch -t macos-appkit -t macos-gtk -t macos-qt   # all three desktop toolkits side by side
 day launch -t ios-uikit                      # needs a booted Simulator
-day launch -t android-mdc                    # needs a JDK and a running emulator or device
+day launch -t android-material                    # needs a JDK and a running emulator or device
 day launch -t web-dom                        # serves the WebAssembly build locally
 ```
 

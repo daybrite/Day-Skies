@@ -10,7 +10,7 @@
         <item name="colorOnPrimary">@color/skies_on_primary</item>
         <item name="colorPrimaryContainer">@color/skies_primary_container</item>
         <item name="colorOnPrimaryContainer">@color/skies_on_primary_container</item>
-        <!-- Day's push-nav bar is a MaterialToolbar (day-android DayNavHost); it resolves this
+        <!-- Day's push-nav bar is a MaterialToolbar (day-toolkit-material DayNavHost); it resolves this
              style attribute. Brand blue instead of surface-white, so the bar sits against the
              app's full-bleed sky gradient instead of slicing it. -->
         <item name="toolbarStyle">@style/SkiesToolbar</item>
