@@ -8,6 +8,11 @@ on:
   release:
     types: [released]
   workflow_dispatch:
+    inputs:
+      day-main:
+        description: Build against day's main branch instead of the newest release
+        type: boolean
+        default: false
   schedule:
     - cron: "30 13 * * *" # daily (UTC)
 
@@ -32,7 +37,7 @@ jobs:
       # lock left at an older revision would silently stop testing day at all. The revision is
       # resolved once per run, so every leg compiles the same one. Refresh the lock locally
       # (`cargo update -p day`) when a new framework API lands, so a local build matches.
-      update-day-deps: true
+      day-deps: ${{ inputs.day-main && 'main' || 'auto' }}
       scripts: scripts/weather.yaml
       launch-env: WEATHER_MOCK=1
       locales: en fr ar zh-CN

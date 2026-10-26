@@ -22,8 +22,7 @@ dom = ["day/dom"]
 mock = ["day/mock"]
 
 # rlib for the desktop bin; the mobile pipeline requests the iOS staticlib / Android cdylib
-# explicitly via `cargo rustc --crate-type` (a desktop cdylib blows past the windows-gnu PE
-# export cap).
+# explicitly via `cargo rustc --crate-type`.
 [lib]
 # A constant name, not the package's. Every artifact Day stages is named after the lib target
 # (`libdayapp.a` for the iOS/macOS staticlib, `libdayapp.so` for the Android cdylib, and the
@@ -35,22 +34,22 @@ crate-type = ["rlib"]
 [dependencies]
 # The day framework resolves from git (the crates aren't on crates.io yet). Local development
 # against a checkout goes through the gitignored .cargo/config.toml [patch]; see README.
-day = { git = "https://github.com/daybrite/day.git" }
+day = { package = "day-app", version = "0.6" }
 # Settings and About (docs/settings.md): typed persisted preferences (unit, host, the city
 # list) and the Settings/About surface in each platform's idiom.
-day-piece-settings = { git = "https://github.com/daybrite/day.git" }
+day-piece-settings = "0.6"
 # The platform HTTP stack (URLSession / HttpURLConnection / WinHTTP; ureq+rustls only on
 # Linux/OHOS); system proxies, VPN, and TLS come from the OS, no TLS library in the app.
-day-part-http = { git = "https://github.com/daybrite/day.git" }
+day-part-http = "0.6"
 # Cities page: the "Use current location" one-shot fix (docs/location.md) and the permission
 # ask that must precede it (docs/permissions.md); location never prompts by itself.
-day-part-location = { git = "https://github.com/daybrite/day.git" }
-day-part-permissions = { git = "https://github.com/daybrite/day.git" }
+day-part-location = "0.6"
+day-part-permissions = "0.6"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
 [build-dependencies]
-day-build = { git = "https://github.com/daybrite/day.git" }
+day-build = "0.6"
 
 
 [workspace]
