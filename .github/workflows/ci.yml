@@ -14,7 +14,8 @@ on:
         type: boolean
         default: false
   schedule:
-    - cron: "30 13 * * *" # daily (UTC)
+    - cron: "30 4 * * *" # 04:30 Eastern; staggered across daybrite.
+      timezone: America/New_York
 
 # The repository's own jobs run this checkout's code with a read-only token. The write grants
 # sit on the job that calls the shared workflow, whose release and Pages jobs alone use them;

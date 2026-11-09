@@ -81,16 +81,16 @@ pub fn weather_page(place: City, state: Signal<Load<Weather>>) -> impl Piece {
             Load::Ready(w) => sky(w.family, w.is_day),
             _ => LinearGradient::vertical(Color::hex(0x22304a), Color::hex(0x44546e)),
         })
-        .grow();
+        .grow(Dimension::Both);
     // On immersive backends (android edge-to-edge) the page runs under the status bar and
     // floating nav bar: the backdrop fills that space while the scrolled content starts below
     // it. `safe_area()` is zero everywhere else, so this pads nothing on the other targets.
     let inset = day::safe_area();
     zstack((
         backdrop,
-        scroll(content.padding(Insets::top(inset.top))).grow(),
+        scroll(content.padding(Insets::top(inset.top))).grow(Dimension::Both),
     ))
-    .grow()
+    .grow(Dimension::Both)
 }
 
 fn loaded_view(place: &City, w: &Weather) -> impl Piece + use<> {
@@ -103,7 +103,7 @@ fn loaded_view(place: &City, w: &Weather) -> impl Piece + use<> {
     ))
     .spacing(18.0)
     .align(HAlign::Center)
-    .grow_w()
+    .grow(Dimension::Width)
 }
 
 fn hero(place: &City, w: &Weather) -> impl Piece + use<> {
@@ -170,7 +170,7 @@ fn hourly_strip(w: &Weather) -> impl Piece + use<> {
             ))
             .spacing(6.0)
             .align(HAlign::Center)
-            .grow_w()
+            .grow(Dimension::Width)
         })
         .collect();
 
@@ -232,7 +232,7 @@ fn ten_day(w: &Weather) -> impl Piece + use<> {
                 .column_spacing(Space::S)
                 .row_spacing(Space::M)
                 .align(Alignment::Leading)
-                .grow_w(),
+                .grow(Dimension::Width),
         ))
         .spacing(10.0)
         .align(HAlign::Leading),
@@ -269,7 +269,7 @@ fn range_bar(low: f64, high: f64, wmin: f64, wmax: f64) -> impl Piece {
         ]
     })
     .height(22.0)
-    .grow_w()
+    .grow(Dimension::Width)
 }
 
 fn detail_grid(w: &Weather) -> impl Piece + use<> {
@@ -297,7 +297,7 @@ fn detail_grid(w: &Weather) -> impl Piece + use<> {
     ))
     .spacing(Space::M)
     .align(Alignment::TopLeading)
-    .grow_w()
+    .grow(Dimension::Width)
 }
 
 fn detail_card<M>(title: LocalizedText, value: impl IntoText<M>) -> impl Piece {
@@ -334,7 +334,7 @@ fn card(inner: impl Piece) -> impl Piece {
         .padding(Space::L)
         .background(CARD)
         .corner_radius(18.0)
-        .grow_w()
+        .grow(Dimension::Width)
 }
 
 fn loading_view() -> impl Piece {

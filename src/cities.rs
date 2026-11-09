@@ -305,7 +305,7 @@ pub fn editor() -> impl Piece {
             // list changes or reorders, so actions read the slot's current key at click time and
             // the ids re-register reactively (`id_of`); a build-time key would go stale.
             row((
-                label(move || title(&slot.get()).format()).grow(),
+                label(move || title(&slot.get()).format()).grow(Dimension::Both),
                 button(res::str::cities_edit())
                     .action(move || {
                         let key = slot.key();
@@ -473,5 +473,5 @@ pub fn editor() -> impl Piece {
     ))
     .spacing(Space::M)
     .align(HAlign::Leading)
-    .grow_w()
+    .grow(Dimension::Width)
 }
