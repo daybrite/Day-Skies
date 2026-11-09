@@ -55,4 +55,4 @@ day-build = "0.*"
 [workspace]
 
 [workspace.package]
-version = "0.1.7"
+version = "0.1.8"
