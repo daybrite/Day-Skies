@@ -102,3 +102,13 @@ cities_status_location_failed = تعذر تحديد الموقع: { $error }
 language_name = العربية
 
 open_in_new_window = فتح في نافذة جديدة
+
+# Home Screen weather widget (also generates native Swift resources).
+widget_title = الطقس
+widget_description = الطقس الحالي وتوقعات الساعات القادمة لمدينة محفوظة.
+widget_city = المدينة
+widget_empty = افتح Day Skies لإضافة مدينة.
+widget_high = العظمى
+widget_low = الصغرى
+widget_updated = آخر تحديث
+widget_unavailable = التوقعات غير متاحة

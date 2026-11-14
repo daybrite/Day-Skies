@@ -1,0 +1,20 @@
+/* Generated from resource/locales; do not edit. */
+"app_title" = "Day Skies";
+"cond_clear" = "Dégagé";
+"cond_cloudy" = "Nuageux";
+"cond_drizzle" = "Bruine";
+"cond_fog" = "Brouillard";
+"cond_partly_cloudy" = "Partiellement nuageux";
+"cond_rain" = "Pluie";
+"cond_snow" = "Neige";
+"cond_thunder" = "Orages";
+"data_mock" = "Données fictives · mode capture";
+"weather_now" = "Maint.";
+"widget_city" = "Ville";
+"widget_description" = "Les conditions actuelles et les prochaines heures pour une ville enregistrée.";
+"widget_empty" = "Ouvrez Day Skies pour ajouter une ville.";
+"widget_high" = "Maximum";
+"widget_low" = "Minimum";
+"widget_title" = "Météo";
+"widget_unavailable" = "Prévisions indisponibles";
+"widget_updated" = "Mise à jour";

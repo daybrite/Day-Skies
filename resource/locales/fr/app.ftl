@@ -99,3 +99,13 @@ cities_status_location_failed = Échec de la localisation : { $error }
 language_name = Français
 
 open_in_new_window = Ouvrir dans une nouvelle fenêtre
+
+# Home Screen weather widget (also generates native Swift resources).
+widget_title = Météo
+widget_description = Les conditions actuelles et les prochaines heures pour une ville enregistrée.
+widget_city = Ville
+widget_empty = Ouvrez Day Skies pour ajouter une ville.
+widget_high = Maximum
+widget_low = Minimum
+widget_updated = Mise à jour
+widget_unavailable = Prévisions indisponibles

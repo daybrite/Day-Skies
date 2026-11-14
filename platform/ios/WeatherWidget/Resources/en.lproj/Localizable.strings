@@ -1,0 +1,20 @@
+/* Generated from resource/locales; do not edit. */
+"app_title" = "Day Skies";
+"cond_clear" = "Clear";
+"cond_cloudy" = "Cloudy";
+"cond_drizzle" = "Drizzle";
+"cond_fog" = "Fog";
+"cond_partly_cloudy" = "Partly Cloudy";
+"cond_rain" = "Rain";
+"cond_snow" = "Snow";
+"cond_thunder" = "Thunderstorms";
+"data_mock" = "Mock data · screenshot mode";
+"weather_now" = "Now";
+"widget_city" = "City";
+"widget_description" = "Current conditions and the next few hours for a saved city.";
+"widget_empty" = "Open Day Skies to add a city.";
+"widget_high" = "High";
+"widget_low" = "Low";
+"widget_title" = "Weather";
+"widget_unavailable" = "Forecast unavailable";
+"widget_updated" = "Updated";

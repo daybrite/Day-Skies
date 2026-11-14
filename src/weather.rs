@@ -14,6 +14,11 @@ use serde::Deserialize;
 /// deterministic mock data; unknown ids (custom cities) get the fixed default fixture.
 use crate::cities::City;
 
+/// Now, in seconds since the Unix epoch. Day's clock, because `SystemTime::now()` stops a web build.
+fn fetched_at() -> u64 {
+    day::now_epoch_secs().max(0) as u64
+}
+
 /// Where the currently-displayed data came from, surfaced in the UI.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum DataSource {
@@ -38,6 +43,8 @@ impl std::error::Error for WeatherError {}
 /// The processed model the UI renders: unit-agnostic values in °C / km/h / hPa.
 #[derive(Clone, Debug)]
 pub struct Weather {
+    /// Fetch time, preserved when preferences change or a refresh fails.
+    pub updated_at: u64,
     pub source: DataSource,
     pub temp: f64,
     pub family: Family,
@@ -191,6 +198,7 @@ pub fn mock(place: &City) -> Weather {
     }
 
     Weather {
+        updated_at: fetched_at(),
         source: DataSource::Mock,
         temp: base,
         family,
@@ -319,6 +327,7 @@ fn process(api: ApiResp) -> Weather {
     }
 
     Weather {
+        updated_at: fetched_at(),
         source: DataSource::Live,
         temp: api.current.temperature_2m,
         family: current_family,

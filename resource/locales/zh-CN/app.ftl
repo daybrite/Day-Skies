@@ -96,3 +96,13 @@ cities_status_location_failed = 定位失败：{ $error }
 language_name = 简体中文
 
 open_in_new_window = 在新窗口中打开
+
+# Home Screen weather widget (also generates native Swift resources).
+widget_title = 天气
+widget_description = 已保存城市的当前天气和未来几小时的预报。
+widget_city = 城市
+widget_empty = 打开 Day Skies 添加城市。
+widget_high = 最高
+widget_low = 最低
+widget_updated = 更新于
+widget_unavailable = 天气预报不可用

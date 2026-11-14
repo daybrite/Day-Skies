@@ -14,6 +14,7 @@ mod icons;
 mod settings;
 mod ui;
 mod weather;
+mod widget;
 
 use cities::City;
 use weather::Weather;
@@ -158,6 +159,7 @@ pub fn root() -> impl Piece {
     for city in cities::cities().get_untracked() {
         let _ = resource_for(&city);
     }
+    widget::install();
     // File ▸ New Window (docs/windows.md): the same shell again, which is exactly why the
     // selection lives on a `Scene` rather than in a global; each call gets its own.
     let shell_prefs = prefs.clone();

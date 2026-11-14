@@ -1,0 +1,20 @@
+/* Generated from resource/locales; do not edit. */
+"app_title" = "Day Skies";
+"cond_clear" = "晴";
+"cond_cloudy" = "多云";
+"cond_drizzle" = "毛毛雨";
+"cond_fog" = "雾";
+"cond_partly_cloudy" = "局部多云";
+"cond_rain" = "雨";
+"cond_snow" = "雪";
+"cond_thunder" = "雷暴";
+"data_mock" = "模拟数据 · 截图模式";
+"weather_now" = "现在";
+"widget_city" = "城市";
+"widget_description" = "已保存城市的当前天气和未来几小时的预报。";
+"widget_empty" = "打开 Day Skies 添加城市。";
+"widget_high" = "最高";
+"widget_low" = "最低";
+"widget_title" = "天气";
+"widget_unavailable" = "天气预报不可用";
+"widget_updated" = "更新于";

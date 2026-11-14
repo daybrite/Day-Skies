@@ -42,3 +42,10 @@ height = 640
 [android]
 edge-to-edge = true
 resource-overlays = ["platform/android/res"]
+
+[[extensions]]
+name = "WeatherWidget"
+kind = "widget"
+platforms = ["ios"]
+deployment-target = "17.0"
+app-groups = ["group.dev.daybrite.dayskies"]

@@ -1,0 +1,20 @@
+/* Generated from resource/locales; do not edit. */
+"app_title" = "Day Skies";
+"cond_clear" = "صافٍ";
+"cond_cloudy" = "غائم";
+"cond_drizzle" = "رذاذ";
+"cond_fog" = "ضباب";
+"cond_partly_cloudy" = "غائم جزئياً";
+"cond_rain" = "مطر";
+"cond_snow" = "ثلج";
+"cond_thunder" = "عواصف رعدية";
+"data_mock" = "بيانات وهمية · وضع اللقطات";
+"weather_now" = "الآن";
+"widget_city" = "المدينة";
+"widget_description" = "الطقس الحالي وتوقعات الساعات القادمة لمدينة محفوظة.";
+"widget_empty" = "افتح Day Skies لإضافة مدينة.";
+"widget_high" = "العظمى";
+"widget_low" = "الصغرى";
+"widget_title" = "الطقس";
+"widget_unavailable" = "التوقعات غير متاحة";
+"widget_updated" = "آخر تحديث";

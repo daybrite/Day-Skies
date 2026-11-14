@@ -24,6 +24,13 @@ permissions:
   contents: read
 
 jobs:
+  widget-data:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check widget data and native translations
+        run: sh scripts/test-widget.sh
+
   app:
     uses: daybrite/actions/.github/workflows/dayapp.yml@v1
     permissions:

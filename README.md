@@ -118,6 +118,37 @@ day patch --local /path/to/day
 
 ## Inside the code
 
+### iOS Home Screen widget
+
+On iOS 17 or newer, open Day Skies once, then long-press the Home Screen, choose
+**Edit → Add Widget → Day Skies**, and add the small or medium Weather widget.
+Long-press the widget and choose **Edit Widget** to select a saved city. Tapping it
+opens that city's forecast in Day Skies. The medium widget also shows upcoming hours.
+
+The widget shares saved cities, temperature units, language, and the forecast server
+with the app. It requests a refresh approximately every 30 minutes; iOS controls the
+actual schedule. Cached conditions remain available offline with their update age;
+the hourly strip disappears after two hours without fresh data. A removed city shows
+an empty state until another city is selected. `WEATHER_MOCK=1` snapshots are visibly
+marked as mock data and do not trigger live widget requests.
+
+Both targets claim `group.dev.daybrite.dayskies`. Physical-device distribution needs
+that App Group enabled for the app and widget in the signing profiles. Simulator
+builds work with the checked-in entitlements. The extension is declared in `Day.toml`
+and built by `day launch -t ios-uikit` along with the app.
+
+`cargo test --lib` checks the host snapshot; `sh scripts/test-widget.sh` checks the Swift
+decoder, selection, forecast conversion, time zones, and malformed responses on macOS.
+The CI `widget-data` job runs the Swift checks and round-trips all four native catalogs
+against their Fluent sources, including Unicode combining marks.
+`build.rs` generates native localization accessors and `.strings` files from the four
+Fluent catalogs using `scripts/widget_resources.rs`; edit the Fluent source, then build.
+Apple's App Intents compiler requires literal localization keys at declaration sites,
+so the configuration declarations are generated too. Keep the generated Swift and
+localization files in version control so Xcode can discover them before compiling Rust.
+
+### App modules
+
 - `src/lib.rs` sets up `root()` and the adaptive shell: a `nav` over cities and the
   per-city reactive weather store.
 - `src/weather.rs` is the data layer: the Open-Meteo fetch through `day-part-http`, WMO

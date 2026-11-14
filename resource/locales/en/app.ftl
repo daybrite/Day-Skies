@@ -102,3 +102,13 @@ cities_status_location_failed = Location failed: { $error }
 language_name = English
 
 open_in_new_window = Open in New Window
+
+# Home Screen weather widget (also generates native Swift resources).
+widget_title = Weather
+widget_description = Current conditions and the next few hours for a saved city.
+widget_city = City
+widget_empty = Open Day Skies to add a city.
+widget_high = High
+widget_low = Low
+widget_updated = Updated
+widget_unavailable = Forecast unavailable
