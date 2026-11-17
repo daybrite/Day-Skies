@@ -112,7 +112,10 @@ fn strings_literal(value: &str) -> String {
 }
 
 fn write_changed(path: &Path, value: &str) {
-    if fs::read_to_string(path).ok().as_deref() == Some(value) {
+    // Compared without regard to line endings: a Windows checkout has these files with CRLF
+    // (`core.autocrlf`), and rewriting them with LF would leave the tree modified for no change
+    // in content, which the packaging job's pristine check then refuses.
+    if fs::read_to_string(path).is_ok_and(|current| current.replace("\r\n", "\n") == value) {
         return;
     }
     let dir = path
